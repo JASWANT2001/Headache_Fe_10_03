@@ -61,7 +61,7 @@ const Patients = ({ setCurrentView }) => {
         }
         const token = localStorage.getItem("token");
         const res = await axios.get(
-            `http://localhost:5001/api/patients/${patientId}/assessments`,
+            `/api/patients/${patientId}/assessments`,
             { headers: { Authorization: `Bearer ${token}` } }
         );
         setPatientDetails(prev => ({ ...prev, [patientId]: res.data.data }));
@@ -74,7 +74,7 @@ const Patients = ({ setCurrentView }) => {
         try {
             const token = localStorage.getItem("token");
             const res = await axios.get(
-                `http://localhost:5001/api/patients/${patientId}/assessments`,
+                `/api/patients/${patientId}/assessments`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             const assessments = res.data.data || [];
@@ -105,7 +105,7 @@ const Patients = ({ setCurrentView }) => {
                 try {
                     const imageUrl = patient.patientImage.startsWith('http')
                         ? patient.patientImage
-                        : `http://localhost:5001${patient.patientImage}`;
+                        : `http://3.239.186.138:5001${patient.patientImage}`;
                     doc.addImage(imageUrl, "JPEG", 14, y, 30, 30);
                 } catch {}
             }
@@ -167,7 +167,7 @@ const Patients = ({ setCurrentView }) => {
         try {
             const token = localStorage.getItem("token");
             await axios.delete(
-                `http://localhost:5001/api/patients/${patientId}`,
+                `/api/patients/${patientId}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setPatients(prev => prev.filter(p => p._id !== patientId));
@@ -337,7 +337,7 @@ const Patients = ({ setCurrentView }) => {
                                                             <h3 className="font-semibold mb-4">Patient Image</h3>
                                                             {patient.patientImage ? (
                                                                 <img
-                                                                    src={patient.patientImage.startsWith('http') ? patient.patientImage : `http://localhost:5001${patient.patientImage}`}
+                                                                    src={patient.patientImage.startsWith('http') ? patient.patientImage : `http://3.239.186.138:5001${patient.patientImage}`}
                                                                     alt={patient.name}
                                                                     className="w-full h-40 object-cover rounded-lg"
                                                                 />
@@ -465,7 +465,7 @@ const Patients = ({ setCurrentView }) => {
                                         <h3 className="font-semibold text-sm mb-2">Patient Image</h3>
                                         {patient.patientImage ? (
                                             <img
-                                                src={patient.patientImage.startsWith('http') ? patient.patientImage : `http://localhost:5001${patient.patientImage}`}
+                                                src={patient.patientImage.startsWith('http') ? patient.patientImage : `http://3.239.186.138:5001${patient.patientImage}`}
                                                 alt={patient.name}
                                                 className="w-full h-36 object-cover rounded-lg"
                                             />

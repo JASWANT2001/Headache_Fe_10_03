@@ -48,7 +48,7 @@ export default function PatientCreation({ onBack, onStartDiagnosis, setCurrentVi
       return;
     }
     try {
-      const res = await fetch("//3.239.186.138:5001/api/patients", {
+      const res = await fetch("/api/patients", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

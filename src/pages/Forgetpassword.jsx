@@ -15,7 +15,7 @@ export default function ForgotPassword({ onBack }) {
   const [success, setSuccess] = useState("");
   const [maskedContact, setMaskedContact] = useState("");
 
-  const API_URL = "//3.239.186.138:5001/api/auth";
+  const API_URL = "/api/auth";
 
   /* REQUEST OTP */
 

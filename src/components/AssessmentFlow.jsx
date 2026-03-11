@@ -21,7 +21,7 @@ const AssessmentFlow = () => {
 
         // Fetch patient details
         const patientRes = await axios.get(
-          `http://3.239.186.138:5001/api/patients/${patientId}`,
+          `//3.239.186.138:5001/api/patients/${patientId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -30,7 +30,7 @@ const AssessmentFlow = () => {
 
         // Fetch assessments
         const assessmentRes = await axios.get(
-          `http://3.239.186.138:5001/api/patients/${patientId}/assessments`,
+          `//3.239.186.138:5001/api/patients/${patientId}/assessments`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

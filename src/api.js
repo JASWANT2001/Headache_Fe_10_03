@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // IMPORTANT: This connects your React app to your Node.js backend!
-const API_URL = 'http://3.239.186.138:5001/api';
+const API_URL = '//3.239.186.138:5001/api';
 
 const api = axios.create({
   baseURL: API_URL,

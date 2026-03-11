@@ -1366,7 +1366,7 @@ const payload = {
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        `http://3.239.186.138:5001/api/patients/${patientInfo._id}/assessments`,
+        `//3.239.186.138:5001/api/patients/${patientInfo._id}/assessments`,
         {
           method: "POST",
           headers: {

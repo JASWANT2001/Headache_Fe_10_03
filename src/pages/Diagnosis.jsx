@@ -1228,8 +1228,8 @@ export default function HeadacheAssessment({ patientInfo, doctorEmail }) {
   const [previewImage, setPreviewImage] = useState(null);
   const [imageError, setImageError] = useState(null);
   const [diagnosisMatch, setDiagnosisMatch] = useState(null); // null | 'yes' | 'no'
-const [diagnosisIssue, setDiagnosisIssue] = useState("");
-const [remarks, setRemarks] = useState("");
+  const [diagnosisIssue, setDiagnosisIssue] = useState("");
+  const [remarks, setRemarks] = useState("");
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -1288,7 +1288,7 @@ const [remarks, setRemarks] = useState("");
     }
   };
 
-const handleSubmit = async () => {
+  const handleSubmit = async () => {
     const resultNode = flow[currentNode];
 
     console.log("=== SUBMIT CLICKED ===");
@@ -1324,20 +1324,20 @@ const handleSubmit = async () => {
     const finalFlow =
       assessmentHistory.length === 0
         ? history.map(step => ({
-            node: step.node,
-            question: flow[step.node]?.question || "",
-            answer: step.answer
-          }))
+          node: step.node,
+          question: flow[step.node]?.question || "",
+          answer: step.answer
+        }))
         : assessmentHistory;
 
-console.log("=== FRONTEND DEBUG ===");
-console.log("diagnosisMatch:", diagnosisMatch);
-console.log("diagnosisIssue:", diagnosisIssue);  
-console.log("remarks:", remarks);
-console.log("=====================");
+    console.log("=== FRONTEND DEBUG ===");
+    console.log("diagnosisMatch:", diagnosisMatch);
+    console.log("diagnosisIssue:", diagnosisIssue);
+    console.log("remarks:", remarks);
+    console.log("=====================");
 
-const payload = {
-   doctorEmail,
+    const payload = {
+      doctorEmail,
       patientSnapshot: {
         name: patientInfo.name,
         age: patientInfo.age,
@@ -1381,9 +1381,9 @@ const payload = {
 
       if (data.success) {
         setSubmitStatus("success");
-        // setTimeout(() => {
-        //   window.location.reload();
-        // }, 1500);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       } else {
         setSubmitStatus("error");
       }
@@ -1499,9 +1499,8 @@ const payload = {
       {/* ── ASSESSMENT CONTAINER ── */}
       <div className="max-w-[1300px] mx-auto w-full">
         <div
-          className={`bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden transition-all duration-300 ${
-            isAnimating ? "opacity-0 transform scale-95" : "opacity-100 transform scale-100"
-          }`}
+          className={`bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden transition-all duration-300 ${isAnimating ? "opacity-0 transform scale-95" : "opacity-100 transform scale-100"
+            }`}
         >
 
           {!isResult ? (
@@ -1551,11 +1550,10 @@ const payload = {
                       return (
                         <label
                           key={index}
-                          className={`flex items-start p-4 sm:p-5 md:p-6 border rounded-xl cursor-pointer transition shadow-sm ${
-                            isChecked
+                          className={`flex items-start p-4 sm:p-5 md:p-6 border rounded-xl cursor-pointer transition shadow-sm ${isChecked
                               ? "border-indigo-500 bg-indigo-50"
                               : "border-gray-200 hover:border-indigo-200 hover:shadow-md"
-                          }`}
+                            }`}
                         >
                           <input
                             type="checkbox"
@@ -1591,11 +1589,10 @@ const payload = {
                         setCheckedOptions([]);
                         navigateTo(nextNode, checkedOptions);
                       }}
-                      className={`w-full mt-4 sm:mt-6 p-3.5 sm:p-4 rounded-lg font-semibold text-sm sm:text-base transition ${
-                        isValidSelection
+                      className={`w-full mt-4 sm:mt-6 p-3.5 sm:p-4 rounded-lg font-semibold text-sm sm:text-base transition ${isValidSelection
                           ? "bg-indigo-600 hover:bg-indigo-700 text-white"
                           : "bg-gray-300 text-gray-600 cursor-not-allowed"
-                      }`}
+                        }`}
                     >
                       Next
                     </button>
@@ -1670,10 +1667,10 @@ const payload = {
                     {/* Result actions */}
                     <div className="p-5 sm:p-7 md:p-10 space-y-4 sm:space-y-6">
 
-                   {/* Patient image upload */}
+                      {/* Patient image upload */}
                       <div className="border border-gray-200 rounded-xl p-4 sm:p-6 bg-gray-50">
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Upload Patient Image <span className="text-red-500">*</span>
+                          Proof for patient / Resgiation ss <span className="text-red-500">*</span>
                         </label>
 
                         {!previewImage && (
@@ -1795,7 +1792,7 @@ const payload = {
                         Restart Assessment
                       </button>
 
-                  <button
+                      <button
                         onClick={handleSubmit}
                         disabled={
                           submitStatus === "loading" ||
@@ -1804,23 +1801,22 @@ const payload = {
                           !diagnosisMatch ||
                           (diagnosisMatch === "no" && !diagnosisIssue.trim())
                         }
-                        className={`w-full p-3.5 sm:p-4 rounded-lg font-semibold text-sm sm:text-base ${
-                          submitStatus === "success"
+                        className={`w-full p-3.5 sm:p-4 rounded-lg font-semibold text-sm sm:text-base ${submitStatus === "success"
                             ? "bg-green-500 text-white"
                             : submitStatus === "error"
-                            ? "bg-red-500 hover:bg-red-600 text-white"
-                            : !patientImage
-                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            : "bg-gray-800 hover:bg-gray-900 text-white"
-                        }`}
+                              ? "bg-red-500 hover:bg-red-600 text-white"
+                              : !patientImage
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-gray-800 hover:bg-gray-900 text-white"
+                          }`}
                       >
                         {submitStatus === "loading"
                           ? "Submitting..."
                           : submitStatus === "success"
-                          ? "✓ Submitted Successfully"
-                          : submitStatus === "error"
-                          ? "Retry Submit"
-                          : "Submit Assessment"}
+                            ? "✓ Submitted Successfully"
+                            : submitStatus === "error"
+                              ? "Retry Submit"
+                              : "Submit Assessment"}
                       </button>
 
                       {submitStatus === "error" && (

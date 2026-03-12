@@ -8,6 +8,7 @@ import DoctorsList from '../components/DoctorsList';
 import AllPatients from '../components/AllPatients';
 import ResetPassword from '../components/Resetpassword';
 
+
 import {
   ResponsiveContainer,
   LineChart,
@@ -18,7 +19,9 @@ import {
   Tooltip
 } from "recharts";
 
+
 import Sidebar from "../components/Sidebar";
+
 
 import {
   LayoutDashboard,
@@ -34,7 +37,9 @@ import {
   X
 } from "lucide-react";
 
+
 export default function Dashboard({ user, onLogout }) {
+
 
   const [stats, setStats] = useState(null);
   const [topProviders, setTopProviders] = useState([]);
@@ -42,30 +47,40 @@ export default function Dashboard({ user, onLogout }) {
   const [recentAssessments, setRecentAssessments] = useState([]);
   const [users, setUsers] = useState([]);
 
+
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [loading, setLoading] = useState(true);
+
 
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [showPasswordSuccess, setShowPasswordSuccess] = useState(false);
 
+
   const [doctorStats, setDoctorStats] = useState(null);
+
 
   const [viewedUserId, setViewedUserId] = useState(null);
   const [patientData, setPatientData] = useState(null);
 
+
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
 
   const [editingUser, setEditingUser] = useState(null);
   const [editForm, setEditForm] = useState({ username: '', email: '', phoneNumber: '', role: '' });
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState('');
 
+
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
 
   const isSuperAdmin = user?.role === 'admin';
   const [currentView, setCurrentView] = useState('dashboard');
+
+
 
 
   useEffect(() => {
@@ -78,6 +93,7 @@ export default function Dashboard({ user, onLogout }) {
     }
   }, [currentView, isSuperAdmin]);
 
+
   useEffect(() => {
     const handleClickOutside = () => {
       setShowProfileDropdown(false);
@@ -86,9 +102,12 @@ export default function Dashboard({ user, onLogout }) {
     return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
+
   useEffect(() => {
     setMobileSidebarOpen(false);
   }, [currentView]);
+
+
 
 
   const loadAdminDashboard = async () => {
@@ -107,6 +126,7 @@ export default function Dashboard({ user, onLogout }) {
     }
   };
 
+
   const loadDoctorDashboard = async () => {
     try {
       const statsRes = await dashboardAPI.getDoctorStats();
@@ -119,6 +139,7 @@ export default function Dashboard({ user, onLogout }) {
     }
   };
 
+
   const patientActivityData = [
     { day: "Mon", assessments: 2 },
     { day: "Tue", assessments: 4 },
@@ -128,6 +149,8 @@ export default function Dashboard({ user, onLogout }) {
     { day: "Sat", assessments: 2 },
     { day: "Sun", assessments: 1 }
   ];
+
+
 
 
   if (loading) {
@@ -140,6 +163,7 @@ export default function Dashboard({ user, onLogout }) {
       </div>
     );
   }
+
 
   if (currentView === 'createPatient') {
     return (
@@ -155,21 +179,27 @@ export default function Dashboard({ user, onLogout }) {
     );
   }
 
+
   if (currentView === 'diagnosis') {
     return <HeadacheAssessment patientInfo={patientData} doctorEmail={user?.email} />;
   }
+
 
   if (currentView === 'doctors') {
     return <DoctorsList setCurrentView={setCurrentView} />;
   }
 
+
   if (currentView === 'patients') {
     return <Patients setCurrentView={setCurrentView} />;
   }
 
+
   if (currentView === 'allPatients') {
     return <AllPatients setCurrentView={setCurrentView} />;
   }
+
+
 
 
   // ════════════════════════════════════════════════════════════════════════════
@@ -179,12 +209,14 @@ export default function Dashboard({ user, onLogout }) {
     return (
       <div className="flex min-h-screen bg-[#f6f8fc]">
 
+
         {mobileSidebarOpen && (
           <div
             className="fixed inset-0 bg-black/40 z-30 lg:hidden"
             onClick={() => setMobileSidebarOpen(false)}
           />
         )}
+
 
         <div
           className={`
@@ -201,10 +233,13 @@ export default function Dashboard({ user, onLogout }) {
           />
         </div>
 
+
         <div className="flex-1 flex flex-col min-w-0">
+
 
           {/* HEADER */}
           <div className="flex justify-between items-center px-4 sm:px-6 lg:px-10 py-4 sm:py-6 bg-white border-b">
+
 
             <div className="flex items-center gap-3">
               <button
@@ -213,6 +248,7 @@ export default function Dashboard({ user, onLogout }) {
               >
                 <Menu size={22} />
               </button>
+
 
               <div>
                 <h1 className="text-lg sm:text-2xl font-bold text-gray-800">
@@ -224,11 +260,14 @@ export default function Dashboard({ user, onLogout }) {
               </div>
             </div>
 
+
             <div className="flex items-center gap-3 sm:gap-6">
+
 
               <button className="text-gray-600 hover:text-gray-900">
                 <Bell size={20} />
               </button>
+
 
               <div className="relative">
                 <button
@@ -245,6 +284,7 @@ export default function Dashboard({ user, onLogout }) {
                     {user?.username}
                   </span>
                 </button>
+
 
                 {showProfileDropdown && (
                   <div className="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-lg z-50">
@@ -267,14 +307,18 @@ export default function Dashboard({ user, onLogout }) {
                 )}
               </div>
 
+
             </div>
           </div>
+
 
           {/* CONTENT */}
           <div className="p-4 sm:p-6 lg:p-10">
 
+
             {/* STATS GRID */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-10">
+
 
               <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border flex justify-between">
                 <div>
@@ -289,6 +333,7 @@ export default function Dashboard({ user, onLogout }) {
                 </div>
               </div>
 
+
               <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border flex justify-between">
                 <div>
                   <p className="text-xs sm:text-sm text-gray-500">Assessments Done</p>
@@ -302,6 +347,7 @@ export default function Dashboard({ user, onLogout }) {
                 </div>
               </div>
 
+
               <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border flex justify-between">
                 <div>
                   <p className="text-xs sm:text-sm text-gray-500">Account Status</p>
@@ -312,6 +358,7 @@ export default function Dashboard({ user, onLogout }) {
                   <CheckCircle size={18} className="text-green-600" />
                 </div>
               </div>
+
 
               <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border flex justify-between">
                 <div>
@@ -324,7 +371,9 @@ export default function Dashboard({ user, onLogout }) {
                 </div>
               </div>
 
+
             </div>
+
 
             {/* Patient Activity Chart */}
             <div className="bg-white rounded-xl shadow-sm border p-4 sm:p-6 mb-6 sm:mb-10">
@@ -348,8 +397,10 @@ export default function Dashboard({ user, onLogout }) {
               </div>
             </div>
 
+
           </div>
         </div>
+
 
         {showResetPassword && (
           <ResetPassword
@@ -360,6 +411,7 @@ export default function Dashboard({ user, onLogout }) {
             }}
           />
         )}
+
 
         {showPasswordSuccess && (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
@@ -383,9 +435,12 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
 
+
       </div>
     );
   }
+
+
 
 
   // ════════════════════════════════════════════════════════════════════════════
@@ -394,12 +449,14 @@ export default function Dashboard({ user, onLogout }) {
   return (
     <div className="flex min-h-screen bg-[#f6f8fc]">
 
+
       {mobileSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-30 lg:hidden"
           onClick={() => setMobileSidebarOpen(false)}
         />
       )}
+
 
       <div
         className={`
@@ -416,10 +473,13 @@ export default function Dashboard({ user, onLogout }) {
         />
       </div>
 
+
       <div className="flex-1 flex flex-col min-w-0">
+
 
         {/* HEADER */}
         <div className="flex justify-between items-center px-4 sm:px-6 lg:px-10 py-4 sm:py-6 bg-white border-b">
+
 
           <div className="flex items-center gap-3">
             <button
@@ -429,6 +489,7 @@ export default function Dashboard({ user, onLogout }) {
               <Menu size={22} />
             </button>
 
+
             <div>
               <h1 className="text-lg sm:text-2xl font-bold text-gray-800">Dashboard</h1>
               <p className="text-gray-500 text-xs sm:text-sm hidden sm:block">
@@ -436,6 +497,7 @@ export default function Dashboard({ user, onLogout }) {
               </p>
             </div>
           </div>
+
 
           <div className="flex items-center gap-2 sm:gap-6">
             <button className="text-gray-600 hover:text-gray-900">
@@ -452,13 +514,17 @@ export default function Dashboard({ user, onLogout }) {
             </button>
           </div>
 
+
         </div>
+
 
         {/* CONTENT */}
         <div className="p-4 sm:p-6 lg:p-10">
 
+
           {/* METRICS */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-10">
+
 
             <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border flex justify-between">
               <div>
@@ -473,6 +539,7 @@ export default function Dashboard({ user, onLogout }) {
               </div>
             </div>
 
+
             <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border flex justify-between">
               <div>
                 <p className="text-xs sm:text-sm text-gray-500">Total Patients</p>
@@ -485,6 +552,7 @@ export default function Dashboard({ user, onLogout }) {
                 <Users size={18} className="text-purple-600" />
               </div>
             </div>
+
 
             <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border flex justify-between">
               <div>
@@ -499,6 +567,7 @@ export default function Dashboard({ user, onLogout }) {
               </div>
             </div>
 
+
             <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border flex justify-between">
               <div>
                 <p className="text-xs sm:text-sm text-gray-500">Avg Patients / Dr</p>
@@ -512,16 +581,20 @@ export default function Dashboard({ user, onLogout }) {
               </div>
             </div>
 
+
           </div>
+
 
           {/* PROVIDERS TABLE */}
           <div className="bg-white rounded-xl shadow-sm border">
+
 
             <div className="p-4 sm:p-6 border-b flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
               <div>
                 <h2 className="font-semibold text-gray-800">Top Performing Providers</h2>
                 <p className="text-xs text-gray-500">Detailed breakdown of medical staff performance</p>
               </div>
+
 
               {/* Filter & Export — hidden on mobile, visible on sm+ */}
               <div className="hidden sm:flex gap-3">
@@ -535,6 +608,7 @@ export default function Dashboard({ user, onLogout }) {
                 </button>
               </div>
             </div>
+
 
             {/* Mobile card list */}
             <div className="sm:hidden divide-y">
@@ -557,9 +631,11 @@ export default function Dashboard({ user, onLogout }) {
               ))}
             </div>
 
+
             {/* Desktop table — hidden on mobile */}
             <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-sm min-w-[600px]">
+
 
                 <thead className="text-gray-500 border-b bg-gray-50">
                   <tr>
@@ -572,9 +648,11 @@ export default function Dashboard({ user, onLogout }) {
                   </tr>
                 </thead>
 
+
                 <tbody>
                   {users.map(provider => (
                     <tr key={provider._id} className="border-b hover:bg-gray-50">
+
 
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -588,7 +666,9 @@ export default function Dashboard({ user, onLogout }) {
                         </div>
                       </td>
 
+
                       <td className="px-6 py-4 text-gray-600 text-sm">Neurology</td>
+
 
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -604,31 +684,41 @@ export default function Dashboard({ user, onLogout }) {
                         </div>
                       </td>
 
+
                       <td className="px-6 py-4">
                         <span className="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full">
                           Active
                         </span>
                       </td>
 
+
                       <td className="px-6 py-4 text-gray-600">—</td>
+
 
                       <td className="px-6 py-4 text-gray-400">
                         <button><MoreVertical size={18} /></button>
                       </td>
 
+
                     </tr>
                   ))}
                 </tbody>
 
+
               </table>
             </div>
 
+
           </div>
+
 
         </div>
 
+
       </div>
+
 
     </div>
   );
 }
+

@@ -313,6 +313,7 @@ export default function Login({ onLoginSuccess, onBack }) {
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(e); }}
                 placeholder="Enter your ID or email"
                 style={inputBase}
                 onFocus={e => { e.target.style.borderColor = '#3b82f6'; e.target.style.boxShadow = '0 0 0 3px rgba(59,130,246,0.12)'; e.target.style.background = '#fff'; }}
@@ -349,6 +350,7 @@ export default function Login({ onLoginSuccess, onBack }) {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(e); }}
                 placeholder="Enter your password"
                 style={{
                   ...inputBase,

@@ -34,9 +34,34 @@ import {
   MoreVertical,
   CheckCircle,
   Menu,
-  X
+  X,
+  Loader
 } from "lucide-react";
 
+
+// // Animated counter hook
+// function useAnimatedCounter(target, duration = 800) {
+//   const [count, setCount] = React.useState(0);
+
+//   React.useEffect(() => {
+//     let start = 0;
+//     const increment = target / (duration / 16);
+
+//     const timer = setInterval(() => {
+//       start += increment;
+//       if (start >= target) {
+//         setCount(target);
+//         clearInterval(timer);
+//       } else {
+//         setCount(Math.floor(start));
+//       }
+//     }, 16);
+
+//     return () => clearInterval(timer);
+//   }, [target, duration]);
+
+//   return count;
+// }
 
 export default function Dashboard({ user, onLogout }) {
 
@@ -50,6 +75,7 @@ export default function Dashboard({ user, onLogout }) {
 
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
 
 
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -112,6 +138,7 @@ export default function Dashboard({ user, onLogout }) {
 
   const loadAdminDashboard = async () => {
     try {
+      setLoading(true);
       const statsRes = await dashboardAPI.getStats();
       const { overview, topProviders, recentPatients } = statsRes.data.data;
       setStats(overview);
@@ -129,6 +156,7 @@ export default function Dashboard({ user, onLogout }) {
 
   const loadDoctorDashboard = async () => {
     try {
+      setLoading(true);
       const statsRes = await dashboardAPI.getDoctorStats();
       setDoctorStats(statsRes.data.data);
       setRecentAssessments([]);
@@ -150,15 +178,26 @@ export default function Dashboard({ user, onLogout }) {
     { day: "Sun", assessments: 1 }
   ];
 
+  const formatLastActive = (date) => {
+    if (!date) return 'Not specified';
+
+    const parsedDate = new Date(date);
+    if (Number.isNaN(parsedDate.getTime())) {
+      return 'Not specified';
+    }
+
+    return parsedDate.toLocaleString();
+  };
+
 
 
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-cyan-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 font-medium">Loading dashboard...</p>
+      <div className="flex min-h-screen bg-gray-50 items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader size={48} className="text-indigo-600 animate-spin" />
+          <p className="text-gray-600 text-lg font-medium">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -293,13 +332,15 @@ export default function Dashboard({ user, onLogout }) {
                         setShowResetPassword(true);
                         setShowProfileDropdown(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                      disabled={actionLoading}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 disabled:opacity-50"
                     >
                       Reset Password
                     </button>
                     <button
                       onClick={onLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                      disabled={actionLoading}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 disabled:opacity-50"
                     >
                       Logout
                     </button>
@@ -313,8 +354,15 @@ export default function Dashboard({ user, onLogout }) {
 
 
           {/* CONTENT */}
-          <div className="p-4 sm:p-6 lg:p-10">
-
+          <div className="p-4 sm:p-6 lg:p-10 relative">
+            {actionLoading && (
+              <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-20">
+                <div className="bg-white rounded-xl p-6 flex flex-col items-center gap-3 shadow-xl">
+                  <Loader size={36} className="text-indigo-600 animate-spin" />
+                  <p className="text-sm text-gray-600 font-medium">Processing...</p>
+                </div>
+              </div>
+            )}
 
             {/* STATS GRID */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-10">
@@ -500,15 +548,16 @@ export default function Dashboard({ user, onLogout }) {
 
 
           <div className="flex items-center gap-2 sm:gap-6">
-            <button className="text-gray-600 hover:text-gray-900">
+            {/* <button className="text-gray-600 hover:text-gray-900">
               <Bell size={20} />
-            </button>
+            </button> */}
             <div className="hidden sm:flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-lg">
               <span className="font-medium text-gray-700">{user?.username}</span>
             </div>
             <button
               onClick={onLogout}
-              className="px-3 sm:px-4 py-2 bg-gray-900 text-white rounded-lg text-xs sm:text-sm whitespace-nowrap"
+              disabled={actionLoading}
+              className="px-3 sm:px-4 py-2 bg-gray-900 text-white rounded-lg text-xs sm:text-sm whitespace-nowrap disabled:opacity-50"
             >
               Logout
             </button>
@@ -519,8 +568,15 @@ export default function Dashboard({ user, onLogout }) {
 
 
         {/* CONTENT */}
-        <div className="p-4 sm:p-6 lg:p-10">
-
+        <div className="p-4 sm:p-6 lg:p-10 relative">
+          {actionLoading && (
+            <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-20">
+              <div className="bg-white rounded-xl p-6 flex flex-col items-center gap-3 shadow-xl">
+                <Loader size={36} className="text-indigo-600 animate-spin" />
+                <p className="text-sm text-gray-600 font-medium">Processing...</p>
+              </div>
+            </div>
+          )}
 
           {/* METRICS */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-10">
@@ -592,12 +648,12 @@ export default function Dashboard({ user, onLogout }) {
             <div className="p-4 sm:p-6 border-b flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
               <div>
                 <h2 className="font-semibold text-gray-800">Top Performing Providers</h2>
-                <p className="text-xs text-gray-500">Detailed breakdown of medical staff performance</p>
+                {/* <p className="text-xs text-gray-500">Detailed breakdown of medical staff performance</p> */}
               </div>
 
 
               {/* Filter & Export — hidden on mobile, visible on sm+ */}
-              <div className="hidden sm:flex gap-3">
+              {/* <div className="hidden sm:flex gap-3">
                 <button className="flex items-center gap-2 px-4 py-2 border rounded-lg text-sm">
                   <Filter size={14} />
                   Filter
@@ -606,7 +662,7 @@ export default function Dashboard({ user, onLogout }) {
                   <Download size={14} />
                   Export
                 </button>
-              </div>
+              </div> */}
             </div>
 
 
@@ -640,7 +696,7 @@ export default function Dashboard({ user, onLogout }) {
                 <thead className="text-gray-500 border-b bg-gray-50">
                   <tr>
                     <th className="px-6 py-4 text-left">Doctor</th>
-                    <th className="px-6 py-4 text-left">Department</th>
+                    <th className="px-6 py-4 text-left">Location</th>
                     <th className="px-6 py-4 text-left">Patients Treated</th>
                     <th className="px-6 py-4 text-left">Status</th>
                     <th className="px-6 py-4 text-left">Last Active</th>
@@ -667,7 +723,7 @@ export default function Dashboard({ user, onLogout }) {
                       </td>
 
 
-                      <td className="px-6 py-4 text-gray-600 text-sm">Neurology</td>
+                      <td className="px-6 py-4 text-gray-600 text-sm">{provider.location || 'Not specified'}</td>
 
 
                       <td className="px-6 py-4">
@@ -692,7 +748,9 @@ export default function Dashboard({ user, onLogout }) {
                       </td>
 
 
-                      <td className="px-6 py-4 text-gray-600">—</td>
+                      <td className="px-6 py-4 text-gray-600">
+                        {formatLastActive(provider.lastLogin || provider.lastActive)}
+                      </td>
 
 
                       <td className="px-6 py-4 text-gray-400">
@@ -711,7 +769,6 @@ export default function Dashboard({ user, onLogout }) {
 
           </div>
 
-
         </div>
 
 
@@ -721,4 +778,3 @@ export default function Dashboard({ user, onLogout }) {
     </div>
   );
 }
-

@@ -7,137 +7,105 @@ import ForgotPassword from './Forgetpassword';
 // Medical SVG illustration - headache/neurology themed, fills full panel
 function MedicalIllustration() {
   return (
-    <svg
-      viewBox="0 0 500 700"
-      preserveAspectRatio="xMidYMid slice"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ width: '100%', height: '100%', display: 'block' }}
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100%",
+        overflow: "hidden",
+        background: "#0f172a"
+      }}
     >
-      <defs>
-        <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#1a2a4a" />
-          <stop offset="100%" stopColor="#0d1b35" />
-        </linearGradient>
-        <radialGradient id="glowBlue" cx="50%" cy="45%" r="55%">
-          <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.32" />
-          <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
-        </radialGradient>
-        <radialGradient id="glowPurple" cx="60%" cy="65%" r="50%">
-          <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.22" />
-          <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
-        </radialGradient>
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-          <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-        <filter id="softglow">
-          <feGaussianBlur stdDeviation="8" result="coloredBlur" />
-          <feMerge><feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-        <linearGradient id="bottomFade" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#0d1b35" stopOpacity="0" />
-          <stop offset="100%" stopColor="#050f23" stopOpacity="0.92" />
-        </linearGradient>
-      </defs>
 
-      {/* Full background */}
-      <rect width="500" height="700" fill="url(#bgGrad)" />
+      {/* Background Image */}
+      <img
+        src="https://res.cloudinary.com/dfibmva2e/image/upload/v1773455193/hero-bg_qqgoge.jpg"
+        // src="https://images.stockcake.com/public/1/9/d/19d13828-c999-4e2d-a191-9da4dd8bd824_large/confident-medical-professional-stockcake.jpg"
+        alt="doctor consultation"
+        style={{
+          width: "100%",
+          height: "95%",
+          objectFit: "cover",
+          filter: "brightness(0.45)"
+        }}
+      />
 
-      {/* Ambient glows */}
-      <ellipse cx="200" cy="300" rx="260" ry="240" fill="url(#glowBlue)" />
-      <ellipse cx="370" cy="480" rx="200" ry="180" fill="url(#glowPurple)" />
+      {/* Gradient overlay */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(180deg, rgba(2,6,23,0.2) 0%, rgba(2,6,23,0.7) 65%, rgba(2,6,23,0.95) 100%)"
+        }}
+      />
 
-      {/* Grid lines */}
-      {[...Array(16)].map((_, i) => (
-        <line key={`h${i}`} x1="0" y1={i * 47} x2="500" y2={i * 47} stroke="#ffffff" strokeOpacity="0.04" strokeWidth="1" />
-      ))}
-      {[...Array(12)].map((_, i) => (
-        <line key={`v${i}`} x1={i * 45} y1="0" x2={i * 45} y2="700" stroke="#ffffff" strokeOpacity="0.04" strokeWidth="1" />
-      ))}
-
-      {/* TOP DATA CHIPS */}
-      <rect x="28" y="40" width="130" height="42" rx="10" fill="#0f2040" stroke="#3b82f6" strokeWidth="1.2" opacity="0.92" />
-      <text x="44" y="58" fill="#60a5fa" fontSize="9.5" fontFamily="monospace" letterSpacing="1">NEURAL SCAN</text>
-      <text x="44" y="73" fill="#34d399" fontSize="11" fontFamily="monospace" fontWeight="bold">● ACTIVE</text>
-
-      <rect x="342" y="40" width="130" height="42" rx="10" fill="#0f2040" stroke="#8b5cf6" strokeWidth="1.2" opacity="0.92" />
-      <text x="358" y="58" fill="#a78bfa" fontSize="9.5" fontFamily="monospace" letterSpacing="1">PAIN INDEX</text>
-      <text x="358" y="73" fill="#f59e0b" fontSize="11" fontFamily="monospace" fontWeight="bold">7.4 / 10</text>
-
-      {/* BRAIN */}
-      <g filter="url(#softglow)" opacity="0.9">
-        <path
-          d="M170 360 Q145 335 142 302 Q139 268 162 252 Q178 240 196 246 Q204 220 224 212 Q248 204 264 221 Q280 204 302 208 Q324 212 332 233 Q354 228 370 246 Q388 266 382 298 Q396 318 390 344 Q384 372 360 384 Q357 412 334 423 Q312 434 290 420 Q274 434 254 432 Q234 434 216 419 Q194 428 174 415 Q154 402 153 380 Q144 373 144 362 Q144 356 170 360Z"
-          fill="#1e3a6e"
-          opacity="0.45"
+      {/* Floating particles */}
+      {/* {[...Array(20)].map((_, i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            width: "4px",
+            height: "4px",
+            background: "#60a5fa",
+            borderRadius: "50%",
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            opacity: 0.5,
+            animation: `float ${5 + Math.random() * 5}s infinite ease-in-out`
+          }}
         />
-        <path
-          d="M170 360 Q145 335 142 302 Q139 268 162 252 Q178 240 196 246 Q204 220 224 212 Q248 204 264 221 Q280 204 302 208 Q324 212 332 233 Q354 228 370 246 Q388 266 382 298 Q396 318 390 344 Q384 372 360 384 Q357 412 334 423 Q312 434 290 420 Q274 434 254 432 Q234 434 216 419 Q194 428 174 415 Q154 402 153 380 Q144 373 144 362 Q144 356 170 360Z"
-          fill="none"
-          stroke="#60a5fa"
-          strokeWidth="2.5"
-          strokeLinejoin="round"
-        />
-        <path d="M196 246 Q206 272 202 300 Q198 324 210 342" stroke="#60a5fa" strokeWidth="1.5" fill="none" opacity="0.55" strokeLinecap="round" />
-        <path d="M264 221 Q268 252 262 280 Q258 305 270 326" stroke="#60a5fa" strokeWidth="1.5" fill="none" opacity="0.55" strokeLinecap="round" />
-        <path d="M332 233 Q330 262 324 290 Q318 316 330 338" stroke="#60a5fa" strokeWidth="1.5" fill="none" opacity="0.55" strokeLinecap="round" />
-        <path d="M153 318 Q180 314 208 320 Q234 325 262 318 Q288 312 316 318 Q342 324 374 318" stroke="#60a5fa" strokeWidth="1.5" fill="none" opacity="0.45" strokeLinecap="round" />
-        <path d="M158 358 Q185 354 213 360 Q239 365 267 358 Q293 352 321 358 Q347 364 379 358" stroke="#60a5fa" strokeWidth="1.5" fill="none" opacity="0.45" strokeLinecap="round" />
-      </g>
+      ))} */}
 
-      {/* PAIN LIGHTNING BOLTS */}
-      <g filter="url(#glow)">
-        <polyline points="112,250 100,275 115,279 96,308" stroke="#f59e0b" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.95" />
-        <circle cx="103" cy="279" r="6" fill="#f59e0b" opacity="0.85" />
-        <circle cx="103" cy="279" r="13" fill="#f59e0b" opacity="0.13" />
+      {/* Bottom Text */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: "40px",
+          left: "40px",
+          right: "40px",
+          color: "white"
+        }}
+      >
+        <h2
+          style={{
+            fontSize: "32px",
+            fontWeight: "800",
+            marginBottom: "10px"
+          }}
+        >
+          {/* Intelligent */}
+          <br />
+          <span style={{ color: "#60a5fa" }}>
+            Headache Diagnostics
+          </span>
+        </h2>
 
-        <polyline points="248,175 238,198 252,201 234,228" stroke="#f59e0b" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.95" />
-        <circle cx="244" cy="201" r="6" fill="#f59e0b" opacity="0.85" />
-        <circle cx="244" cy="201" r="13" fill="#f59e0b" opacity="0.13" />
+        <p
+          style={{
+            fontSize: "14px",
+            color: "rgba(220,230,255,0.75)",
+            lineHeight: 1.6
+          }}
+        >
+          Secure clinical platform designed to help
+          neurologists analyze headache patterns
+          and deliver personalized treatments.
+        </p>
+      </div>
 
-        <polyline points="398,255 410,280 395,284 414,313" stroke="#f59e0b" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.95" />
-        <circle cx="402" cy="284" r="6" fill="#f59e0b" opacity="0.85" />
-        <circle cx="402" cy="284" r="13" fill="#f59e0b" opacity="0.13" />
-      </g>
-
-      {/* EEG BRAINWAVE */}
-      <g filter="url(#glow)">
-        <path
-          d="M20 520 L75 520 L92 498 L107 544 L120 484 L134 556 L148 512 L158 520 L215 520 L232 500 L248 542 L263 478 L278 548 L293 508 L303 520 L360 520 L377 498 L393 542 L408 482 L423 550 L438 510 L448 520 L490 520"
-          stroke="#34d399" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round"
-        />
-        <path
-          d="M20 520 L75 520 L92 498 L107 544 L120 484 L134 556 L148 512 L158 520 L215 520 L232 500 L248 542 L263 478 L278 548 L293 508 L303 520 L360 520 L377 498 L393 542 L408 482 L423 550 L438 510 L448 520 L490 520"
-          stroke="#34d399" strokeWidth="8" fill="none" opacity="0.1" strokeLinecap="round" strokeLinejoin="round"
-        />
-        <text x="24" y="510" fill="#34d399" fontSize="10" fontFamily="monospace" opacity="0.65" letterSpacing="1">EEG</text>
-      </g>
-
-      {/* NEURAL NODES */}
-      <g opacity="0.6">
-        <circle cx="100" cy="455" r="5" fill="#8b5cf6" filter="url(#glow)" />
-        <circle cx="148" cy="488" r="3.5" fill="#8b5cf6" />
-        <circle cx="68" cy="476" r="3.5" fill="#8b5cf6" />
-        <line x1="100" y1="455" x2="148" y2="488" stroke="#8b5cf6" strokeWidth="1.2" opacity="0.5" />
-        <line x1="100" y1="455" x2="68" y2="476" stroke="#8b5cf6" strokeWidth="1.2" opacity="0.5" />
-        <circle cx="415" cy="165" r="5" fill="#8b5cf6" filter="url(#glow)" />
-        <circle cx="455" cy="192" r="3.5" fill="#8b5cf6" />
-        <circle cx="438" cy="148" r="3.5" fill="#8b5cf6" />
-        <line x1="415" y1="165" x2="455" y2="192" stroke="#8b5cf6" strokeWidth="1.2" opacity="0.5" />
-        <line x1="415" y1="165" x2="438" y2="148" stroke="#8b5cf6" strokeWidth="1.2" opacity="0.5" />
-      </g>
-
-      {/* BOTTOM DATA CHIP */}
-      <rect x="170" y="600" width="160" height="42" rx="10" fill="#0f2040" stroke="#34d399" strokeWidth="1.2" opacity="0.9" />
-      <text x="198" y="618" fill="#6ee7b7" fontSize="9.5" fontFamily="monospace" letterSpacing="1">HR / BPM</text>
-      <text x="188" y="633" fill="#34d399" fontSize="11" fontFamily="monospace" fontWeight="bold">72 ♥  NORMAL</text>
-
-      <text x="250" y="682" fill="#60a5fa" fontSize="10" fontFamily="monospace" textAnchor="middle" opacity="0.4" letterSpacing="5">NEUROLOGY · DIAGNOSTICS</text>
-
-      {/* Bottom fade overlay */}
-      <rect x="0" y="540" width="500" height="160" fill="url(#bottomFade)" />
-    </svg>
+      {/* Animation keyframes */}
+      <style>
+        {`
+        @keyframes float {
+          0% { transform: translateY(0px); opacity:0.4; }
+          50% { transform: translateY(-12px); opacity:0.9; }
+          100% { transform: translateY(0px); opacity:0.4; }
+        }
+        `}
+      </style>
+    </div>
   );
 }
 
@@ -231,7 +199,7 @@ export default function Login({ onLoginSuccess, onBack }) {
             background: 'linear-gradient(to top, rgba(5,15,35,0.97) 0%, rgba(5,15,35,0.55) 65%, transparent 100%)',
             zIndex: 2,
           }}>
-            <h2 style={{
+            {/* <h2 style={{
               margin: '0 0 10px',
               fontSize: '32px',
               fontWeight: '800',
@@ -241,8 +209,8 @@ export default function Login({ onLoginSuccess, onBack }) {
             }}>
               Refining Your<br />
               <span style={{ color: '#60a5fa' }}>Neural Health</span>
-            </h2>
-            <p style={{
+            </h2> */}
+            {/* <p style={{
               margin: 0,
               fontSize: '14px',
               color: 'rgba(200,220,255,0.65)',
@@ -250,7 +218,7 @@ export default function Login({ onLoginSuccess, onBack }) {
             }}>
               Access your personalized headache treatment plan<br />
               and diagnostics in a secure, clinical environment.
-            </p>
+            </p> */}
           </div>
         </div>
       )}
@@ -437,12 +405,12 @@ export default function Login({ onLoginSuccess, onBack }) {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
 
-          <p style={{ margin: 0, textAlign: 'center', fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.8 }}>
+          {/* <p style={{ margin: 0, textAlign: 'center', fontSize: '12.5px', color: '#94a3b8', lineHeight: 1.8 }}>
             By signing in, you agree to our{' '}
             <span style={{ color: '#3b82f6', cursor: 'pointer' }}>Terms of Service</span>{' '}
             and{' '}
             <span style={{ color: '#3b82f6', cursor: 'pointer' }}>Privacy Policy</span>.
-          </p>
+          </p> */}
 
           {onBack && (
             <button

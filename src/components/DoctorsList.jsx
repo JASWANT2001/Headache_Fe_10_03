@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { userAPI } from "../api";
 import CreateUserForm from "./CreateUserForm";
 import Sidebar from "./Sidebar";
-import { Search, Eye, Pencil, Trash2, Plus, Menu, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, Eye, Pencil, Trash2, Plus, Menu, ChevronDown, ChevronUp, Loader } from "lucide-react";
 
 export default function DoctorsList({ setCurrentView }) {
 
     const [search, setSearch] = useState("");
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState(false);
 
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [viewedUserId, setViewedUserId] = useState(null);
@@ -32,6 +33,7 @@ export default function DoctorsList({ setCurrentView }) {
 
     const loadUsers = async () => {
         try {
+            setLoading(true);
             const res = await userAPI.getAllUsers();
             setUsers(res.data.data);
         } catch (err) {
@@ -78,6 +80,7 @@ export default function DoctorsList({ setCurrentView }) {
     const handleEditSubmit = async (e) => {
         e.preventDefault();
         try {
+            setActionLoading(true);
             await userAPI.updateUser(editingUser._id, editForm);
             setUsers(prev =>
                 prev.map(u => u._id === editingUser._id ? { ...u, ...editForm } : u)
@@ -85,6 +88,8 @@ export default function DoctorsList({ setCurrentView }) {
             setEditingUser(null);
         } catch (err) {
             console.error(err);
+        } finally {
+            setActionLoading(false);
         }
     };
 
@@ -94,11 +99,14 @@ export default function DoctorsList({ setCurrentView }) {
 
     const handleDeleteConfirm = async () => {
         try {
+            setActionLoading(true);
             await userAPI.deleteUser(deleteTarget._id);
             setUsers(prev => prev.filter(u => u._id !== deleteTarget._id));
             setDeleteTarget(null);
         } catch (err) {
             console.error(err);
+        } finally {
+            setActionLoading(false);
         }
     };
 
@@ -114,7 +122,14 @@ export default function DoctorsList({ setCurrentView }) {
     });
 
     if (loading) {
-        return <div className="p-10">Loading doctors...</div>;
+        return (
+            <div className="flex min-h-screen bg-[#f6f8fc] items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader size={48} className="text-indigo-600 animate-spin" />
+                    <p className="text-gray-600 text-lg font-medium">Loading doctors...</p>
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -164,7 +179,8 @@ export default function DoctorsList({ setCurrentView }) {
 
                     <button
                         onClick={() => setShowCreateForm(!showCreateForm)}
-                        className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap mt-6 sm:mt-0 self-start sm:self-auto"
+                        disabled={actionLoading}
+                        className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap mt-6 sm:mt-0 self-start sm:self-auto disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <Plus size={16} />
                         <span className="hidden sm:inline">Create New Doctor</span>
@@ -194,7 +210,15 @@ export default function DoctorsList({ setCurrentView }) {
                 </div>
 
                 {/* ── DESKTOP TABLE (md+) ── */}
-                <div className="hidden md:block bg-white rounded-xl shadow overflow-hidden">
+                <div className="hidden md:block bg-white rounded-xl shadow overflow-hidden relative">
+                    {actionLoading && (
+                        <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10 rounded-xl">
+                            <div className="flex flex-col items-center gap-2">
+                                <Loader size={32} className="text-indigo-600 animate-spin" />
+                                <p className="text-sm text-gray-600 font-medium">Processing...</p>
+                            </div>
+                        </div>
+                    )}
                     <div className="overflow-x-auto">
                         <table className="w-full min-w-[800px]">
                             <thead className="bg-gray-50 text-gray-500 text-sm">
@@ -243,13 +267,13 @@ export default function DoctorsList({ setCurrentView }) {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex gap-3">
-                                                    <button onClick={() => handleViewToggle(u._id)} className="text-gray-500 hover:text-blue-600">
+                                                    <button onClick={() => handleViewToggle(u._id)} disabled={actionLoading} className="text-gray-500 hover:text-blue-600 disabled:opacity-50">
                                                         <Eye size={18} />
                                                     </button>
-                                                    <button onClick={() => handleEditClick(u)} className="text-gray-500 hover:text-yellow-600">
+                                                    <button onClick={() => handleEditClick(u)} disabled={actionLoading} className="text-gray-500 hover:text-yellow-600 disabled:opacity-50">
                                                         <Pencil size={18} />
                                                     </button>
-                                                    <button onClick={() => handleDeleteClick(u)} className="text-gray-500 hover:text-red-600">
+                                                    <button onClick={() => handleDeleteClick(u)} disabled={actionLoading} className="text-gray-500 hover:text-red-600 disabled:opacity-50">
                                                         <Trash2 size={18} />
                                                     </button>
                                                 </div>
@@ -259,21 +283,29 @@ export default function DoctorsList({ setCurrentView }) {
                                         {/* EXPAND PANEL — desktop */}
                                         {viewedUserId === u._id && (
                                             <tr className="bg-gray-50">
-                                                <td colSpan={8} className="p-6">
+                                                <td colSpan={8} className="p-6 relative">
+                                                    {actionLoading && (
+                                                        <div className="absolute inset-0 bg-gray-50/50 flex items-center justify-center rounded-lg">
+                                                            <Loader size={24} className="text-indigo-600 animate-spin" />
+                                                        </div>
+                                                    )}
                                                     {editingUser?._id === u._id ? (
                                                         <form onSubmit={handleEditSubmit}>
                                                             <h3 className="font-semibold mb-4">Edit Doctor</h3>
                                                             <div className="grid grid-cols-3 gap-4">
-                                                                <input name="username" value={editForm.username} onChange={handleEditChange} placeholder="Username" className="border p-2 rounded" />
-                                                                <input name="email" value={editForm.email} onChange={handleEditChange} placeholder="Email" className="border p-2 rounded" />
-                                                                <input name="phoneNumber" value={editForm.phoneNumber} onChange={handleEditChange} placeholder="Phone" className="border p-2 rounded" />
-                                                                <input name="location" value={editForm.location} onChange={handleEditChange} placeholder="Location" className="border p-2 rounded" />
-                                                                <input name="instituteName" value={editForm.instituteName} onChange={handleEditChange} placeholder="Institute Name" className="border p-2 rounded" />
-                                                                <input name="instituteType" value={editForm.instituteType} onChange={handleEditChange} placeholder="Institute Type" className="border p-2 rounded" />
+                                                                <input name="username" value={editForm.username} onChange={handleEditChange} placeholder="Username" className="border p-2 rounded" disabled={actionLoading} />
+                                                                <input name="email" value={editForm.email} onChange={handleEditChange} placeholder="Email" className="border p-2 rounded" disabled={actionLoading} />
+                                                                <input name="phoneNumber" value={editForm.phoneNumber} onChange={handleEditChange} placeholder="Phone" className="border p-2 rounded" disabled={actionLoading} />
+                                                                <input name="location" value={editForm.location} onChange={handleEditChange} placeholder="Location" className="border p-2 rounded" disabled={actionLoading} />
+                                                                <input name="instituteName" value={editForm.instituteName} onChange={handleEditChange} placeholder="Institute Name" className="border p-2 rounded" disabled={actionLoading} />
+                                                                <input name="instituteType" value={editForm.instituteType} onChange={handleEditChange} placeholder="Institute Type" className="border p-2 rounded" disabled={actionLoading} />
                                                             </div>
                                                             <div className="flex gap-3 mt-4">
-                                                                <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">Save Changes</button>
-                                                                <button type="button" onClick={() => setEditingUser(null)} className="bg-gray-300 px-4 py-2 rounded">Cancel</button>
+                                                                <button type="submit" disabled={actionLoading} className="bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2 disabled:opacity-50">
+                                                                    {actionLoading ? <Loader size={16} className="animate-spin" /> : null}
+                                                                    Save Changes
+                                                                </button>
+                                                                <button type="button" onClick={() => setEditingUser(null)} disabled={actionLoading} className="bg-gray-300 px-4 py-2 rounded disabled:opacity-50">Cancel</button>
                                                             </div>
                                                         </form>
                                                     ) : (
@@ -313,7 +345,7 @@ export default function DoctorsList({ setCurrentView }) {
                                                                 </div>
                                                             </div>
                                                             <div className="mt-6">
-                                                                <button onClick={() => handleEditClick(u)} className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg">
+                                                                <button onClick={() => handleEditClick(u)} disabled={actionLoading} className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg disabled:opacity-50">
                                                                     Edit Doctor
                                                                 </button>
                                                             </div>
@@ -330,7 +362,15 @@ export default function DoctorsList({ setCurrentView }) {
                 </div>
 
                 {/* ── MOBILE CARD LIST (below md) ── */}
-                <div className="md:hidden space-y-3">
+                <div className="md:hidden space-y-3 relative">
+                    {actionLoading && (
+                        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-20">
+                            <div className="bg-white rounded-xl p-6 flex flex-col items-center gap-3 shadow-xl">
+                                <Loader size={36} className="text-indigo-600 animate-spin" />
+                                <p className="text-sm text-gray-600 font-medium">Processing...</p>
+                            </div>
+                        </div>
+                    )}
                     {filteredUsers.map(u => (
                         <div key={u._id} className="bg-white rounded-xl shadow overflow-hidden">
 
@@ -353,7 +393,8 @@ export default function DoctorsList({ setCurrentView }) {
                                     }
                                     <button
                                         onClick={() => handleViewToggle(u._id)}
-                                        className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100"
+                                        disabled={actionLoading}
+                                        className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 disabled:opacity-50"
                                     >
                                         {viewedUserId === u._id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                                     </button>
@@ -362,23 +403,26 @@ export default function DoctorsList({ setCurrentView }) {
 
                             {/* Expanded content */}
                             {viewedUserId === u._id && (
-                                <div className="border-t px-4 pb-4 pt-3">
+                                <div className="border-t px-4 pb-4 pt-3 relative">
 
                                     {editingUser?._id === u._id ? (
                                         /* EDIT FORM — mobile */
                                         <form onSubmit={handleEditSubmit}>
                                             <h3 className="font-semibold mb-3 text-sm">Edit Doctor</h3>
                                             <div className="grid grid-cols-1 gap-3">
-                                                <input name="username" value={editForm.username} onChange={handleEditChange} placeholder="Username" className="border p-2 rounded text-sm w-full" />
-                                                <input name="email" value={editForm.email} onChange={handleEditChange} placeholder="Email" className="border p-2 rounded text-sm w-full" />
-                                                <input name="phoneNumber" value={editForm.phoneNumber} onChange={handleEditChange} placeholder="Phone" className="border p-2 rounded text-sm w-full" />
-                                                <input name="location" value={editForm.location} onChange={handleEditChange} placeholder="Location" className="border p-2 rounded text-sm w-full" />
-                                                <input name="instituteName" value={editForm.instituteName} onChange={handleEditChange} placeholder="Institute Name" className="border p-2 rounded text-sm w-full" />
-                                                <input name="instituteType" value={editForm.instituteType} onChange={handleEditChange} placeholder="Institute Type" className="border p-2 rounded text-sm w-full" />
+                                                <input name="username" value={editForm.username} onChange={handleEditChange} placeholder="Username" className="border p-2 rounded text-sm w-full" disabled={actionLoading} />
+                                                <input name="email" value={editForm.email} onChange={handleEditChange} placeholder="Email" className="border p-2 rounded text-sm w-full" disabled={actionLoading} />
+                                                <input name="phoneNumber" value={editForm.phoneNumber} onChange={handleEditChange} placeholder="Phone" className="border p-2 rounded text-sm w-full" disabled={actionLoading} />
+                                                <input name="location" value={editForm.location} onChange={handleEditChange} placeholder="Location" className="border p-2 rounded text-sm w-full" disabled={actionLoading} />
+                                                <input name="instituteName" value={editForm.instituteName} onChange={handleEditChange} placeholder="Institute Name" className="border p-2 rounded text-sm w-full" disabled={actionLoading} />
+                                                <input name="instituteType" value={editForm.instituteType} onChange={handleEditChange} placeholder="Institute Type" className="border p-2 rounded text-sm w-full" disabled={actionLoading} />
                                             </div>
                                             <div className="flex gap-2 mt-3">
-                                                <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded text-sm flex-1">Save</button>
-                                                <button type="button" onClick={() => setEditingUser(null)} className="bg-gray-200 px-4 py-2 rounded text-sm flex-1">Cancel</button>
+                                                <button type="submit" disabled={actionLoading} className="bg-green-600 text-white px-4 py-2 rounded text-sm flex-1 flex items-center justify-center gap-2 disabled:opacity-50">
+                                                    {actionLoading ? <Loader size={14} className="animate-spin" /> : null}
+                                                    Save
+                                                </button>
+                                                <button type="button" onClick={() => setEditingUser(null)} disabled={actionLoading} className="bg-gray-200 px-4 py-2 rounded text-sm flex-1 disabled:opacity-50">Cancel</button>
                                             </div>
                                         </form>
                                     ) : (
@@ -419,13 +463,15 @@ export default function DoctorsList({ setCurrentView }) {
                                             <div className="flex gap-2 pt-1">
                                                 <button
                                                     onClick={() => handleEditClick(u)}
-                                                    className="flex items-center gap-1.5 px-3 py-2 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-lg text-xs font-medium flex-1 justify-center"
+                                                    disabled={actionLoading}
+                                                    className="flex items-center gap-1.5 px-3 py-2 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-lg text-xs font-medium flex-1 justify-center disabled:opacity-50"
                                                 >
                                                     <Pencil size={14} /> Edit
                                                 </button>
                                                 <button
                                                     onClick={() => handleDeleteClick(u)}
-                                                    className="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-medium flex-1 justify-center"
+                                                    disabled={actionLoading}
+                                                    className="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-medium flex-1 justify-center disabled:opacity-50"
                                                 >
                                                     <Trash2 size={14} /> Delete
                                                 </button>
@@ -446,8 +492,11 @@ export default function DoctorsList({ setCurrentView }) {
                     <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-sm">
                         <h3 className="font-semibold mb-4">Delete {deleteTarget.username}?</h3>
                         <div className="flex gap-3">
-                            <button onClick={() => setDeleteTarget(null)} className="px-4 py-2 bg-gray-200 rounded flex-1">Cancel</button>
-                            <button onClick={handleDeleteConfirm} className="px-4 py-2 bg-red-600 text-white rounded flex-1">Delete</button>
+                            <button onClick={() => setDeleteTarget(null)} disabled={actionLoading} className="px-4 py-2 bg-gray-200 rounded flex-1 disabled:opacity-50">Cancel</button>
+                            <button onClick={handleDeleteConfirm} disabled={actionLoading} className="px-4 py-2 bg-red-600 text-white rounded flex-1 flex items-center justify-center gap-2 disabled:opacity-50">
+                                {actionLoading ? <Loader size={14} className="animate-spin" /> : null}
+                                Delete
+                            </button>
                         </div>
                     </div>
                 </div>

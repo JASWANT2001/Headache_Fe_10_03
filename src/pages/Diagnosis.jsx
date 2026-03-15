@@ -7,7 +7,7 @@ const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 import {
   AlertCircle, CheckCircle, Info, ArrowLeft, Activity, Clock, Zap,
-  Wind, AlertTriangle, Brain, Eye, Timer, Moon
+  Wind, AlertTriangle, Brain, Eye, Timer, Moon, Languages, Fingerprint, User
 } from 'lucide-react';
 
 const flow = {
@@ -1457,393 +1457,464 @@ export default function HeadacheAssessment({ patientInfo, doctorEmail }) {
   };
 
   return (
-    /* ─── ROOT: full-height scroll, responsive horizontal padding ─── */
-    <div className="min-h-screen bg-[#f6f8fc] px-4 sm:px-6 md:px-10 py-6 sm:py-8 md:py-12 flex flex-col justify-center md:block">
-
-      {/* ── PAGE HEADER ── */}
-      <div className="max-w-[1300px] mx-auto w-full mb-6 sm:mb-8 md:mb-10">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
-          Headache Assessment
-        </h1>
-        <p className="text-gray-500 mt-1 sm:mt-2 text-sm sm:text-base">
-          International Classification of Headache Disorders – 3rd Edition
-        </p>
+    /* ─── ROOT: Professional healthcare aesthetic ─── */
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 px-4 sm:px-6 md:px-10 py-6 sm:py-8 md:py-12 flex flex-col justify-center md:block relative">
+      
+      {/* Subtle animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-100/20 rounded-full blur-3xl opacity-30"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-teal-100/20 rounded-full blur-3xl opacity-20"></div>
       </div>
-
-
-      {/* ── PATIENT INFO CARD ── */}
-      {patientInfo && (
-        <div className="max-w-[1300px] mx-auto w-full mb-6 sm:mb-8 md:mb-10">
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 sm:p-6 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-            <div>
-              <p className="text-xs text-gray-500">Patient</p>
-              <p className="font-semibold text-gray-900 text-sm">{patientInfo.name}</p>
+ 
+      <div className="relative z-10">
+        {/* ── PAGE HEADER ── */}
+        <div className="max-w-[1300px] mx-auto w-full mb-8 sm:mb-10 md:mb-14">
+          <div className="space-y-2">
+            <div className="flex items-baseline gap-3">
+              <div className="w-1.5 h-10  rounded-full"></div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 tracking-tight leading-tight">
+                Headache Compass
+              </h1>
             </div>
-            <div>
-              <p className="text-xs text-gray-500">Age</p>
-              <p className="font-semibold text-gray-900 text-sm">{patientInfo.age}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500">Headache Type</p>
-              <p className="font-semibold text-gray-900 text-sm">{patientInfo.headacheType || "—"}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500">Severity</p>
-              <p className="font-semibold text-gray-900 text-sm">{patientInfo.severity || "—"}</p>
-            </div>
+            <p className="text-slate-500 text-sm sm:text-base font-medium ml-5 tracking-wide">
+              International Classification of Headache Disorders – 3rd Edition
+            </p>
           </div>
         </div>
-      )}
+ 
+        {/* ── PATIENT INFO CARD ── */}
+        {patientInfo && (
+          <div className="max-w-[1300px] mx-auto w-full mb-8 sm:mb-10 md:mb-12">
+            <div className="relative overflow-hidden rounded-[32px] border border-slate-200/70 bg-white/85 shadow-[0_28px_80px_-32px_rgba(15,23,42,0.35)] backdrop-blur-xl">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(59,130,246,0.16),_transparent_34%),radial-gradient(circle_at_bottom_left,_rgba(20,184,166,0.16),_transparent_28%)]"></div>
+              <div className="relative p-5 sm:p-7 md:p-9">
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                  <div className="flex items-start gap-4 sm:gap-5">
+                    {/* <div className="flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25">
+                      <Brain className="h-7 w-7 sm:h-8 sm:w-8" />
+                    </div> */}
+                    <div className="space-y-2">
+                      {/* <span className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.28em] text-sky-700">
+                        Patient Information
+                      </span> */}
+                      <div>
+                        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-950">
+                          {patientInfo.name}
+                        </h2>
+                        {/* <p className="mt-1 max-w-2xl text-sm sm:text-base text-slate-600">
+                          Reviewing headache profile details before continuing the diagnostic pathway.
+                        </p> */}
+                      </div>
+                    </div>
+                  </div>
 
+                  <div className="inline-flex items-center gap-2 self-start rounded-2xl border border-emerald-200 bg-emerald-50/90 px-4 py-2.5 text-sm font-semibold text-emerald-800 shadow-sm shadow-emerald-100/70">
+                    <CheckCircle className="h-4 w-4" />
+                    Assessment context loaded
+                  </div>
+                </div>
 
-      {/* ── ASSESSMENT CONTAINER ── */}
-      <div className="max-w-[1300px] mx-auto w-full">
-        <div
-          className={`bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden transition-all duration-300 ${isAnimating ? "opacity-0 transform scale-95" : "opacity-100 transform scale-100"
+                <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                  <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-4 sm:p-5 shadow-sm shadow-slate-200/60">
+                    <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white">
+                      <User className="h-5 w-5" />
+                    </div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-slate-400">Patient Name</p>
+                    <p className="mt-2 text-base font-semibold text-slate-900 sm:text-lg break-words">{patientInfo.name}</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-4 sm:p-5 shadow-sm shadow-slate-200/60">
+                    <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+                      <Clock className="h-5 w-5" />
+                    </div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-slate-400">Age</p>
+                    <p className="mt-2 text-base font-semibold text-slate-900 sm:text-lg">{patientInfo.age}</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-4 sm:p-5 shadow-sm shadow-slate-200/60">
+                    <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 text-teal-700">
+                      <Languages className="h-5 w-5" />
+                    </div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-slate-400">Language</p>
+                    <p className="mt-2 text-base font-semibold text-slate-900 sm:text-lg">{patientInfo.language}</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-200/80 bg-white/80 p-4 sm:p-5 shadow-sm shadow-slate-200/60">
+                    <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
+                      <Fingerprint className="h-5 w-5" />
+                    </div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-slate-400">Patient ID</p>
+                    <p className="mt-2 text-base font-semibold text-slate-900 sm:text-lg">{patientInfo.patientId}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+ 
+        {/* ── ASSESSMENT CONTAINER ── */}
+        <div className="max-w-[1300px] mx-auto w-full">
+          <div
+            className={`bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-200/70 overflow-hidden transition-all duration-400 ease-out ${
+              isAnimating ? "opacity-0 transform scale-95" : "opacity-100 transform scale-100"
             }`}
-        >
-
-          {!isResult ? (
-
-            /* ── QUESTION PANEL ── */
-            <div className="p-5 sm:p-8 md:p-12">
-
-              {/* Question header row */}
-              <div className="flex items-center justify-between mb-6 sm:mb-8 md:mb-10">
-                <span className="text-xs font-semibold text-indigo-600 bg-indigo-100 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full">
-                  Question {history.length + 1}
-                </span>
-
-                {history.length > 0 && (
-                  <button
-                    onClick={goBack}
-                    className="flex items-center text-gray-600 hover:text-gray-900 font-medium text-sm sm:text-base"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-1 sm:mr-2" />
-                    Back
-                  </button>
-                )}
-              </div>
-
-              {/* Question text */}
-              <div className="mb-6 sm:mb-8 md:mb-10">
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-900 mb-3 sm:mb-4 leading-snug">
-                  {node.question}
-                </h2>
-
-                {node.description && (
-                  <p className="text-gray-600 text-xs sm:text-sm">
-                    {Array.isArray(node.description)
-                      ? node.description.join(" • ")
-                      : node.description}
-                  </p>
-                )}
-              </div>
-
-              {/* Options */}
-              <div className="space-y-3 sm:space-y-4">
-
-                {node.type === "checkbox" ? (
-                  <>
-                    {node.options.map((option, index) => {
-                      const isChecked = checkedOptions.includes(option.value);
-                      return (
-                        <label
-                          key={index}
-                          className={`flex items-start p-4 sm:p-5 md:p-6 border rounded-xl cursor-pointer transition shadow-sm ${isChecked
-                              ? "border-indigo-500 bg-indigo-50"
-                              : "border-gray-200 hover:border-indigo-200 hover:shadow-md"
+          >
+            {!isResult ? (
+              /* ── QUESTION PANEL ── */
+              <div className="p-5 sm:p-8 md:p-14">
+                {/* Question header row */}
+                <div className="flex items-center justify-between mb-8 sm:mb-10 md:mb-12">
+                  <span className="text-xs font-bold text-white bg-gradient-to-r from-teal-500 to-blue-600 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full shadow-lg shadow-blue-500/20">
+                    Question {history.length + 1}
+                  </span>
+ 
+                  {history.length > 0 && (
+                    <button
+                      onClick={goBack}
+                      className="flex items-center text-slate-600 hover:text-slate-900 font-semibold text-sm sm:text-base transition-colors duration-200 hover:gap-2 gap-1"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      Back
+                    </button>
+                  )}
+                </div>
+ 
+                {/* Question text */}
+                <div className="mb-8 sm:mb-10 md:mb-14">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-4 sm:mb-5 leading-snug tracking-tight">
+                    {node.question}
+                  </h2>
+ 
+                  {node.description && (
+                    <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-medium">
+                      {Array.isArray(node.description)
+                        ? node.description.join(" • ")
+                        : node.description}
+                    </p>
+                  )}
+                </div>
+ 
+                {/* Options */}
+                <div className="space-y-3 sm:space-y-4">
+                  {node.type === "checkbox" ? (
+                    <>
+                      {node.options.map((option, index) => {
+                        const isChecked = checkedOptions.includes(option.value);
+                        return (
+                          <label
+                            key={index}
+                            className={`flex items-start p-5 sm:p-6 md:p-7 border-2 rounded-2xl cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md ${
+                              isChecked
+                                ? "border-blue-500 bg-gradient-to-br from-blue-50 to-teal-50/30 shadow-lg shadow-blue-200/30"
+                                : "border-slate-200 hover:border-blue-300 hover:bg-slate-50/50"
                             }`}
-                        >
-                          <input
-                            type="checkbox"
-                            className="mt-0.5 mr-3 sm:mt-1 sm:mr-4 h-4 w-4 sm:h-5 sm:w-5 accent-indigo-600 flex-shrink-0"
-                            checked={isChecked}
-                            onChange={() => {
-                              setCheckedOptions((prev) =>
-                                prev.includes(option.value)
-                                  ? prev.filter((v) => v !== option.value)
-                                  : [...prev, option.value]
-                              );
-                            }}
-                          />
-                          <span className="text-gray-900 font-medium text-sm sm:text-base leading-snug">
+                          >
+                            <input
+                              type="checkbox"
+                              className="mt-1 mr-4 h-5 w-5 accent-blue-600 flex-shrink-0 cursor-pointer"
+                              checked={isChecked}
+                              onChange={() => {
+                                setCheckedOptions((prev) =>
+                                  prev.includes(option.value)
+                                    ? prev.filter((v) => v !== option.value)
+                                    : [...prev, option.value]
+                                );
+                              }}
+                            />
+                            <span className="text-slate-900 font-semibold text-base sm:text-lg leading-snug">
+                              {option.label}
+                            </span>
+                          </label>
+                        );
+                      })}
+ 
+                      {/* Next button */}
+                      <button
+                        disabled={!isValidSelection}
+                        onClick={() => {
+                          let nextNode = node.next;
+                          if (
+                            node.id === "chronic_feature_select" &&
+                            checkedOptions.length === 1 &&
+                            checkedOptions.includes("none")
+                          ) {
+                            nextNode = "chronic_migraine_aura_criteria";
+                          }
+                          setCheckedOptions([]);
+                          navigateTo(nextNode, checkedOptions);
+                        }}
+                        className={`w-full mt-8 p-4 sm:p-5 rounded-2xl font-bold text-base sm:text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-95 ${
+                          isValidSelection
+                            ? "bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white shadow-blue-500/30"
+                            : "bg-slate-200 text-slate-400 cursor-not-allowed"
+                        }`}
+                      >
+                        Proceed to Next Question
+                      </button>
+                    </>
+                  ) : (
+                    node.options.map((option, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          if (
+                            currentNode === "sunct_frequency_check" &&
+                            option.value === "yes"
+                          ) {
+                            const autonomicAnswer = history.find(
+                              (h) => h.node === "sunct_distribution"
+                            );
+                            if (autonomicAnswer?.answer === "none") {
+                              navigateTo("result_probable_sunct", option.value);
+                            } else {
+                              navigateTo("result_sunct", option.value);
+                            }
+                            return;
+                          }
+                          navigateTo(option.next, option.value);
+                        }}
+                        className="w-full p-5 sm:p-6 md:p-7 text-left border-2 border-slate-200 rounded-2xl shadow-md hover:shadow-xl hover:border-blue-400 hover:bg-gradient-to-br hover:from-blue-50/50 hover:to-teal-50/30 transition-all duration-200 group"
+                      >
+                        <div className="flex items-center gap-4 sm:gap-5">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 flex items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 to-teal-100 text-blue-600 font-bold text-base sm:text-lg group-hover:from-blue-200 group-hover:to-teal-200 transition-colors duration-200">
+                            {String.fromCharCode(65 + index)}
+                          </div>
+                          <span className="font-semibold text-slate-900 text-base sm:text-lg leading-snug group-hover:text-slate-900 transition-colors">
                             {option.label}
                           </span>
-                        </label>
-                      );
-                    })}
-
-                    {/* Next button */}
-                    <button
-                      disabled={!isValidSelection}
-                      onClick={() => {
-                        let nextNode = node.next;
-                        if (
-                          node.id === "chronic_feature_select" &&
-                          checkedOptions.length === 1 &&
-                          checkedOptions.includes("none")
-                        ) {
-                          nextNode = "chronic_migraine_aura_criteria";
-                        }
-                        setCheckedOptions([]);
-                        navigateTo(nextNode, checkedOptions);
-                      }}
-                      className={`w-full mt-4 sm:mt-6 p-3.5 sm:p-4 rounded-lg font-semibold text-sm sm:text-base transition ${isValidSelection
-                          ? "bg-indigo-600 hover:bg-indigo-700 text-white"
-                          : "bg-gray-300 text-gray-600 cursor-not-allowed"
-                        }`}
-                    >
-                      Next
-                    </button>
-                  </>
-
-                ) : (
-
-                  node.options.map((option, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        if (
-                          currentNode === "sunct_frequency_check" &&
-                          option.value === "yes"
-                        ) {
-                          const autonomicAnswer = history.find(
-                            (h) => h.node === "sunct_distribution"
-                          );
-                          if (autonomicAnswer?.answer === "none") {
-                            navigateTo("result_probable_sunct", option.value);
-                          } else {
-                            navigateTo("result_sunct", option.value);
-                          }
-                          return;
-                        }
-                        navigateTo(option.next, option.value);
-                      }}
-                      className="w-full p-4 sm:p-5 md:p-6 text-left border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:border-indigo-300 hover:bg-indigo-50 transition"
-                    >
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600 font-semibold mr-3 sm:mr-4 text-sm sm:text-base">
-                          {String.fromCharCode(65 + index)}
                         </div>
-                        <span className="font-medium text-gray-900 text-sm sm:text-base leading-snug">
-                          {option.label}
-                        </span>
-                      </div>
-                    </button>
-                  ))
-
-                )}
+                      </button>
+                    ))
+                  )}
+                </div>
               </div>
-            </div>
-
-          ) : (
-
-            /* ── RESULT PANEL ── */
-            <div>
-              {(() => {
-                const config = getSeverityConfig(node.severity);
-                const ResultIcon = node.icon || Info;
-
-                return (
-                  <>
-                    {/* Result header */}
-                    <div className={`${config.bgColor} p-5 sm:p-7 md:p-10 border-b ${config.borderColor}`}>
-                      <div className="flex items-start gap-4 sm:gap-6">
-                        <div className={`${config.iconBg} p-3 sm:p-4 md:p-5 rounded-xl flex-shrink-0`}>
-                          <ResultIcon className={`w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 ${config.iconColor}`} />
-                        </div>
-                        <div>
-                          <h2 className={`text-lg sm:text-xl md:text-2xl font-bold ${config.textColor} mb-1 sm:mb-2`}>
-                            {node.title}
-                          </h2>
-                          <p className={`${config.textColor} opacity-90 text-sm sm:text-base leading-relaxed`}>
-                            {node.message}
-                          </p>
+            ) : (
+              /* ── RESULT PANEL ── */
+              <div>
+                {(() => {
+                  const config = getSeverityConfig(node.severity);
+                  const ResultIcon = node.icon || Info;
+ 
+                  return (
+                    <>
+                      {/* Result header */}
+                      <div className={`${config.bgColor} p-5 sm:p-8 md:p-10 border-b border-slate-200 relative overflow-hidden`}>
+                        <div className="relative z-10 flex items-start gap-5 sm:gap-6 md:gap-8">
+                          <div className={`${config.iconBg} p-4 sm:p-5 md:p-6 rounded-2xl flex-shrink-0 shadow-lg`}>
+                            <ResultIcon className={`w-8 h-8 sm:w-9 sm:h-9 md:w-11 md:h-11 ${config.iconColor}`} />
+                          </div>
+                          <div className="flex-1">
+                            <h2 className={`text-xl sm:text-2xl md:text-3xl font-bold ${config.textColor} mb-2 sm:mb-3 leading-tight`}>
+                              {node.title}
+                            </h2>
+                            <p className={`${config.textColor} opacity-90 text-sm sm:text-base leading-relaxed font-medium`}>
+                              {node.message}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-
-                    {/* Result actions */}
-                    <div className="p-5 sm:p-7 md:p-10 space-y-4 sm:space-y-6">
-
-                      {/* Patient image upload */}
-                      <div className="border border-gray-200 rounded-xl p-4 sm:p-6 bg-gray-50">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Proof for patient / Resgiation ss <span className="text-red-500">*</span>
-                        </label>
-
-                        {!previewImage && (
-                          <input
-                            type="file"
-                            accept="image/png, image/jpeg, image/jpg, image/webp"
-                            onChange={handleImageUpload}
-                            className="block w-full text-sm text-gray-700"
-                          />
-                        )}
-
-                        {imageError && (
-                          <p className="text-red-500 text-sm mt-2">{imageError}</p>
-                        )}
-
-                        {!patientImage && !imageError && (
-                          <p className="text-xs text-gray-500 mt-1">
-                            Accepted formats: JPG, PNG, WEBP (Max 5MB)
-                          </p>
-                        )}
-
-                        {previewImage && (
-                          <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-                            <img
-                              src={previewImage}
-                              alt="Patient Preview"
-                              className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-lg border"
+ 
+                      {/* Result actions */}
+                      <div className="p-5 sm:p-8 md:p-10 space-y-6 sm:space-y-8">
+ 
+                        {/* Patient image upload */}
+                        <div className="border-2 border-dashed border-slate-200 rounded-2xl p-5 sm:p-7 md:p-8 bg-gradient-to-br from-slate-50 to-blue-50/30 hover:border-blue-300 hover:bg-blue-50/40 transition-all duration-200">
+                          <label className="block text-sm font-bold text-slate-700 mb-3 tracking-tight">
+                            Proof of Patient / Registration screenshot <span className="text-red-500">*</span>
+                          </label>
+ 
+                          {!previewImage && (
+                            <input
+                              type="file"
+                              accept="image/png, image/jpeg, image/jpg, image/webp"
+                              onChange={handleImageUpload}
+                              className="block w-full text-sm text-slate-600 file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-blue-500 file:to-teal-500 file:text-white hover:file:from-blue-600 hover:file:to-teal-600 file:cursor-pointer file:transition-all file:shadow-md cursor-pointer"
                             />
-                            <div className="flex flex-row sm:flex-col gap-2">
-                              <button
-                                type="button"
-                                onClick={removeImage}
-                                className="px-3 py-1.5 sm:px-4 sm:py-2 text-sm bg-red-100 text-red-600 rounded-md hover:bg-red-200"
-                              >
-                                Remove Image
-                              </button>
-                              <label className="px-3 py-1.5 sm:px-4 sm:py-2 text-sm bg-gray-200 rounded-md cursor-pointer hover:bg-gray-300 text-center">
-                                Change Image
-                                <input
-                                  type="file"
-                                  accept="image/png, image/jpeg, image/jpg, image/webp"
-                                  onChange={handleImageUpload}
-                                  className="hidden"
-                                />
-                              </label>
+                          )}
+ 
+                          {imageError && (
+                            <p className="text-red-600 text-sm mt-3 font-medium bg-red-50 p-3 rounded-xl">{imageError}</p>
+                          )}
+ 
+                          {!patientImage && !imageError && (
+                            <p className="text-xs text-slate-500 mt-2 font-medium">
+                              Accepted formats: JPG, PNG, WEBP (Max 5MB)
+                            </p>
+                          )}
+ 
+                          {previewImage && (
+                            <div className="mt-5 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6">
+                              <img
+                                src={previewImage}
+                                alt="Patient Preview"
+                                className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-xl border-2 border-slate-200 shadow-md"
+                              />
+                              <div className="flex flex-col gap-2.5 w-full sm:w-auto">
+                                <button
+                                  type="button"
+                                  onClick={removeImage}
+                                  className="px-4 py-2.5 text-sm font-semibold bg-red-100 text-red-700 rounded-xl hover:bg-red-200 transition-colors duration-200"
+                                >
+                                  Remove Image
+                                </button>
+                                <label className="px-4 py-2.5 text-sm font-semibold bg-slate-200 rounded-xl cursor-pointer hover:bg-slate-300 text-center text-slate-700 transition-colors duration-200">
+                                  Change Image
+                                  <input
+                                    type="file"
+                                    accept="image/png, image/jpeg, image/jpg, image/webp"
+                                    onChange={handleImageUpload}
+                                    className="hidden"
+                                  />
+                                </label>
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Diagnosis Match Question */}
-                      <div className="border border-gray-200 rounded-xl p-4 sm:p-6 bg-gray-50">
-                        <label className="block text-sm font-semibold text-gray-700 mb-3">
-                          Does the diagnosis match with your prescription? <span className="text-red-500">*</span>
-                        </label>
-                        <div className="flex gap-4 sm:gap-6">
-                          <label className="flex items-center cursor-pointer">
-                            <input
-                              type="radio"
-                              name="diagnosisMatch"
-                              value="yes"
-                              checked={diagnosisMatch === "yes"}
-                              onChange={(e) => {
-                                setDiagnosisMatch(e.target.value);
-                                setDiagnosisIssue(""); // Clear issue if switching to yes
-                              }}
-                              className="mr-2 h-4 w-4 accent-indigo-600"
-                            />
-                            <span className="text-sm text-gray-700">Yes</span>
-                          </label>
-                          <label className="flex items-center cursor-pointer">
-                            <input
-                              type="radio"
-                              name="diagnosisMatch"
-                              value="no"
-                              checked={diagnosisMatch === "no"}
-                              onChange={(e) => setDiagnosisMatch(e.target.value)}
-                              className="mr-2 h-4 w-4 accent-indigo-600"
-                            />
-                            <span className="text-sm text-gray-700">No</span>
-                          </label>
+                          )}
                         </div>
-
-                        {/* Conditional Issue Field */}
-                        {diagnosisMatch === "no" && (
-                          <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              What is the issue? <span className="text-red-500">*</span>
+ 
+                        {/* Diagnosis Match Question */}
+                        <div className="border-2 border-slate-200 rounded-2xl p-5 sm:p-7 md:p-8 bg-gradient-to-br from-slate-50 to-slate-50/50">
+                          <label className="block text-sm font-bold text-slate-700 mb-5 tracking-tight">
+                            Does the diagnosis match with your clinical assessment? <span className="text-red-500">*</span>
+                          </label>
+                          <div className="flex gap-6 sm:gap-8">
+                            <label className="flex items-center cursor-pointer group">
+                              <input
+                                type="radio"
+                                name="diagnosisMatch"
+                                value="yes"
+                                checked={diagnosisMatch === "yes"}
+                                onChange={(e) => {
+                                  setDiagnosisMatch(e.target.value);
+                                  setDiagnosisIssue("");
+                                }}
+                                className="mr-3 h-5 w-5 accent-blue-600 cursor-pointer"
+                              />
+                              <span className="text-base text-slate-700 font-semibold group-hover:text-slate-900 transition-colors">Yes</span>
                             </label>
-                            <textarea
-                              value={diagnosisIssue}
-                              onChange={(e) => setDiagnosisIssue(e.target.value)}
-                              placeholder="Describe the issue with the diagnosis..."
-                              rows={3}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                            />
+                            <label className="flex items-center cursor-pointer group">
+                              <input
+                                type="radio"
+                                name="diagnosisMatch"
+                                value="no"
+                                checked={diagnosisMatch === "no"}
+                                onChange={(e) => setDiagnosisMatch(e.target.value)}
+                                className="mr-3 h-5 w-5 accent-blue-600 cursor-pointer"
+                              />
+                              <span className="text-base text-slate-700 font-semibold group-hover:text-slate-900 transition-colors">No</span>
+                            </label>
                           </div>
-                        )}
+ 
+                          {/* Conditional Issue Field */}
+                          {diagnosisMatch === "no" && (
+                            <div className="mt-5 pt-5 border-t border-slate-200">
+                              <label className="block text-sm font-bold text-slate-700 mb-3 tracking-tight">
+                                Please describe the discrepancy: <span className="text-red-500">*</span>
+                              </label>
+                              <textarea
+                                value={diagnosisIssue}
+                                onChange={(e) => setDiagnosisIssue(e.target.value)}
+                                placeholder="Explain what differs from the assessment..."
+                                rows={3}
+                                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none text-sm font-medium text-slate-900 placeholder-slate-400 transition-all duration-200 resize-none"
+                              />
+                            </div>
+                          )}
+                        </div>
+ 
+                        {/* General Remarks */}
+                        <div className="border-2 border-slate-200 rounded-2xl p-5 sm:p-7 md:p-8 bg-gradient-to-br from-slate-50 to-slate-50/50">
+                          <label className="block text-sm font-bold text-slate-700 mb-3 tracking-tight">
+                            Clinical Notes & Observations (Optional)
+                          </label>
+                          <textarea
+                            value={remarks}
+                            onChange={(e) => setRemarks(e.target.value)}
+                            placeholder="Add any additional clinical notes or observations..."
+                            rows={3}
+                            className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none text-sm font-medium text-slate-900 placeholder-slate-400 transition-all duration-200 resize-none"
+                          />
+                        </div>
+ 
+                        {/* Action Buttons */}
+                        <div className="space-y-3 pt-6">
+  {/* Primary Submit Button */}
+  <button
+    onClick={handleSubmit}
+    disabled={
+      submitStatus === "loading" ||
+      submitStatus === "success" ||
+      !patientImage ||
+      !diagnosisMatch ||
+      (diagnosisMatch === "no" && !diagnosisIssue.trim())
+    }
+    className={`w-full relative overflow-hidden p-4 sm:p-6 rounded-2xl font-bold text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-2xl transform active:scale-95 flex items-center justify-center gap-2.5 ${
+      submitStatus === "success"
+        ? "bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/40"
+        : submitStatus === "error"
+        ? "bg-red-500 hover:bg-red-600 text-white shadow-red-500/40"
+        : submitStatus === "loading"
+        ? "bg-blue-500 text-white shadow-blue-500/40"
+        : !patientImage || !diagnosisMatch || (diagnosisMatch === "no" && !diagnosisIssue.trim())
+        ? "bg-slate-300 text-slate-500 cursor-not-allowed shadow-none"
+        : "bg-gradient-to-r from-teal-500 via-blue-500 to-blue-600 hover:from-teal-600 hover:via-blue-600 hover:to-blue-700 text-white shadow-blue-500/35 hover:scale-[1.01]"
+    }`}
+  >
+    {submitStatus === "loading" && (
+      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+    )}
+    {submitStatus === "success" && (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+      </svg>
+    )}
+    <span>
+      {submitStatus === "loading"
+        ? "Submitting Assessment..."
+        : submitStatus === "success"
+        ? "Assessment Submitted"
+        : submitStatus === "error"
+        ? "Retry Submission"
+        : "Submit Assessment"}
+    </span>
+  </button>
+ 
+  {/* Error Message */}
+  {submitStatus === "error" && (
+    <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+      <p className="text-red-700 text-sm font-medium">
+        Submission failed. Please check your information and try again.
+      </p>
+    </div>
+  )}
+ 
+  {/* Secondary Buttons */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <button
+      onClick={restart}
+      className="w-full p-4 sm:p-5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-semibold text-base transition-all duration-200 shadow-sm hover:shadow-md active:scale-95 border border-slate-200 hover:border-slate-300"
+    >
+      Start New Assessment
+    </button>
+ 
+    {history.length > 0 && (
+      <button
+        onClick={goBack}
+        className="w-full p-4 sm:p-5 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-700 rounded-2xl font-semibold text-base transition-all duration-200 shadow-sm hover:shadow-md active:scale-95 border-2 border-slate-200 hover:border-slate-300"
+      >
+        Review Previous Response
+      </button>
+    )}
+  </div>
+ </div>
                       </div>
-
-                      {/* General Remarks */}
-                      <div className="border border-gray-200 rounded-xl p-4 sm:p-6 bg-gray-50">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Remarks (Optional)
-                        </label>
-                        <textarea
-                          value={remarks}
-                          onChange={(e) => setRemarks(e.target.value)}
-                          placeholder="Add any additional notes or observations..."
-                          rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                        />
-                      </div>
-
-                      <button
-                        onClick={restart}
-                        className="w-full p-3.5 sm:p-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold text-sm sm:text-base"
-                      >
-                        Restart Assessment
-                      </button>
-
-                      <button
-                        onClick={handleSubmit}
-                        disabled={
-                          submitStatus === "loading" ||
-                          submitStatus === "success" ||
-                          !patientImage ||
-                          !diagnosisMatch ||
-                          (diagnosisMatch === "no" && !diagnosisIssue.trim())
-                        }
-                        className={`w-full p-3.5 sm:p-4 rounded-lg font-semibold text-sm sm:text-base ${submitStatus === "success"
-                            ? "bg-green-500 text-white"
-                            : submitStatus === "error"
-                              ? "bg-red-500 hover:bg-red-600 text-white"
-                              : !patientImage
-                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                : "bg-gray-800 hover:bg-gray-900 text-white"
-                          }`}
-                      >
-                        {submitStatus === "loading"
-                          ? "Submitting..."
-                          : submitStatus === "success"
-                            ? "✓ Submitted Successfully"
-                            : submitStatus === "error"
-                              ? "Retry Submit"
-                              : "Submit Assessment"}
-                      </button>
-
-                      {submitStatus === "error" && (
-                        <p className="text-red-500 text-sm text-center">
-                          Submission failed. Please try again.
-                        </p>
-                      )}
-
-                      {history.length > 0 && (
-                        <button
-                          onClick={goBack}
-                          className="w-full p-3.5 sm:p-4 border border-gray-300 rounded-lg hover:border-gray-400 text-sm sm:text-base"
-                        >
-                          Review Previous Answer
-                        </button>
-                      )}
-
-                    </div>
-                  </>
-                );
-              })()}
-            </div>
-
-          )}
+                    </>
+                  );
+                })()}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
     </div>
   );
 }

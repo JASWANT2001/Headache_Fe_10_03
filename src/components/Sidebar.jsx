@@ -35,16 +35,16 @@ const Sidebar = ({ setCurrentView, active, onClose }) => {
     return (
         <div className="w-64 bg-white border-r border-gray-200 min-h-screen p-5 flex flex-col">
 
-            {/* APP TITLE + Close button (close only shown on mobile) */}
-            <div className="mb-8 flex items-center justify-between">
-                <h1 className="text-2xl font-bold text-gray-800">
-                    Neuro Admin
+            {/* APP TITLE */}
+            <div className="mt-4 mb-3 relative flex items-center justify-center">
+                <h1 className="text-xl font-bold text-gray-800">
+                    Headache Compass
                 </h1>
 
                 {onClose && (
                     <button
                         onClick={onClose}
-                        className="lg:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition"
+                        className="absolute right-0 lg:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition"
                         aria-label="Close sidebar"
                     >
                         <X size={20} />
@@ -54,41 +54,21 @@ const Sidebar = ({ setCurrentView, active, onClose }) => {
 
             {/* OVERVIEW */}
             <Section title="Overview">
-                <Item
-                    id="dashboard"
-                    label="Dashboard"
-                    icon="📊"
-                />
+                <Item id="dashboard" label="Dashboard" icon="📊" />
             </Section>
 
             {/* ADMIN ONLY */}
             {isAdmin && (
                 <Section title="Management">
-                    <Item
-                        id="doctors"
-                        label="Doctors"
-                        icon="🩺"
-                    />
-                    <Item
-                        id="allPatients"
-                        label="All Patients"
-                        icon="👥"
-                    />
+                    <Item id="doctors" label="Doctors" icon="🩺" />
+                    <Item id="allPatients" label="All Patients" icon="👥" />
                 </Section>
             )}
 
             {/* WORKSPACE */}
             <Section title="My Workspace">
-                <Item
-                    id="patients"
-                    label="My Patients"
-                    icon="❤️"
-                />
-                <Item
-                    id="createPatient"
-                    label="Add Patient"
-                    icon="➕"
-                />
+                <Item id="patients" label="My Patients" icon="❤️" />
+                <Item id="createPatient" label="Add Patient" icon="➕" />
             </Section>
 
         </div>

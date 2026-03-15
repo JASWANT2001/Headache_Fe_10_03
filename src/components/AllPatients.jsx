@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { patientAPI } from "../api";
 import Sidebar from "./Sidebar";
-import { Search, ChevronDown, ChevronUp, X, User, Stethoscope, ClipboardList, Calendar, Hash, Download } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, X, User, Stethoscope, ClipboardList, Calendar, Hash, Download, Loader, Menu } from "lucide-react";
 import * as XLSX from 'xlsx';
 
 
@@ -9,6 +9,7 @@ export default function AllPatients({ setCurrentView }) {
 
     const [patients, setPatients] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState(false);
     const [error, setError] = useState("");
 
     const [search, setSearch] = useState("");
@@ -18,7 +19,7 @@ export default function AllPatients({ setCurrentView }) {
     const [expandedId, setExpandedId] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-   // Mobile detail sheet
+    // Mobile detail sheet
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [exporting, setExporting] = useState(false);
 
@@ -26,9 +27,9 @@ export default function AllPatients({ setCurrentView }) {
         fetchAllPatients();
     }, [page]);
 
- const fetchAllPatients = async () => {
-        setLoading(true);
+    const fetchAllPatients = async () => {
         try {
+            setLoading(true);
             const res = await patientAPI.getAllPatients({ page, limit: 10 });
             setPatients(res.data.data);
             setPagination(res.data.pagination);
@@ -40,6 +41,7 @@ export default function AllPatients({ setCurrentView }) {
     };
 
     const handleExport = async () => {
+        setActionLoading(true);
         setExporting(true);
         try {
             const res = await patientAPI.getAllPatients({ page: 1, limit: 10000 });
@@ -58,28 +60,28 @@ export default function AllPatients({ setCurrentView }) {
 
             Object.keys(patientsByDoctor).forEach(doctorName => {
                 const patients = patientsByDoctor[doctorName];
-                
-              const sheetData = [
-    ['Patient ID', 'Name', 'Age', 'Diagnosis', 'Remarks', 'Created Date']
-];
 
-patients.forEach(patient => {
-    const diagnosis = patient.assessments?.[0]?.diagnosis?.title || '';
-    sheetData.push([
-        patient.patientId || '',
-        patient.name || '',
-        patient.age || '',
-        diagnosis,
-        patient.remarks || '',
-        new Date(patient.createdAt).toLocaleDateString()
-    ]);
-});
+                const sheetData = [
+                    ['Patient ID', 'Name', 'Age', 'Diagnosis', 'Remarks', 'Created Date']
+                ];
 
-const ws = XLSX.utils.aoa_to_sheet(sheetData);
-ws['!cols'] = [
-    { wch: 15 }, { wch: 20 }, { wch: 8 }, { wch: 25 },
-    { wch: 30 }, { wch: 15 }
-];
+                patients.forEach(patient => {
+                    const diagnosis = patient.assessments?.[0]?.diagnosis?.title || '';
+                    sheetData.push([
+                        patient.patientId || '',
+                        patient.name || '',
+                        patient.age || '',
+                        diagnosis,
+                        patient.remarks || '',
+                        new Date(patient.createdAt).toLocaleDateString()
+                    ]);
+                });
+
+                const ws = XLSX.utils.aoa_to_sheet(sheetData);
+                ws['!cols'] = [
+                    { wch: 15 }, { wch: 20 }, { wch: 8 }, { wch: 25 },
+                    { wch: 30 }, { wch: 15 }
+                ];
                 let sheetName = doctorName.substring(0, 31).replace(/[\\\/\*\[\]\:\?]/g, '-');
                 XLSX.utils.book_append_sheet(wb, ws, sheetName);
             });
@@ -91,11 +93,10 @@ ws['!cols'] = [
             console.error("Export failed:", err);
             alert("Failed to export data. Please try again.");
         } finally {
+            setActionLoading(false);
             setExporting(false);
         }
     };
-
-  
 
     const filteredPatients = patients.filter((p) => {
         const searchText = search.toLowerCase();
@@ -109,10 +110,10 @@ ws['!cols'] = [
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-screen bg-[#f6f8fc]">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mx-auto"></div>
-                    <p className="mt-3 text-sm text-gray-500">Loading patients...</p>
+            <div className="flex min-h-screen bg-[#f6f8fc] items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader size={48} className="text-indigo-600 animate-spin" />
+                    <p className="text-gray-600 text-lg font-medium">Loading patients...</p>
                 </div>
             </div>
         );
@@ -147,11 +148,7 @@ ws['!cols'] = [
                                 onClick={() => setSidebarOpen(true)}
                                 className="md:hidden p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition shrink-0"
                             >
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                                    <line x1="3" y1="6" x2="21" y2="6" />
-                                    <line x1="3" y1="12" x2="21" y2="12" />
-                                    <line x1="3" y1="18" x2="21" y2="18" />
-                                </svg>
+                                <Menu size={20} />
                             </button>
                             <div>
                                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">All Patients</h1>
@@ -161,25 +158,30 @@ ws['!cols'] = [
                             </div>
                         </div>
 
-                     <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-wrap">
                             <button
                                 onClick={handleExport}
-                                disabled={exporting}
+                                disabled={actionLoading}
                                 className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl shadow-sm hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
                             >
-                                <Download size={16} />
+                                {actionLoading ? (
+                                    <Loader size={16} className="animate-spin" />
+                                ) : (
+                                    <Download size={16} />
+                                )}
                                 <span className="text-sm font-medium hidden sm:inline">
                                     {exporting ? "Exporting..." : "Export"}
                                 </span>
                             </button>
 
-                            <div className="flex items-center gap-3 bg-white px-4 py-2.5 rounded-xl shadow-sm border border-gray-100 w-full sm:w-80">
+                            <div className="flex items-center gap-3 bg-white px-4 py-2.5 rounded-xl shadow-sm border border-gray-100 flex-1 sm:flex-none sm:w-80">
                                 <Search size={16} className="text-gray-400 shrink-0" />
                                 <input
                                     placeholder="Search by name, ID, doctor..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    className="w-full outline-none text-sm bg-transparent"
+                                    disabled={actionLoading}
+                                    className="w-full outline-none text-sm bg-transparent disabled:opacity-50"
                                 />
                             </div>
                         </div>
@@ -192,7 +194,15 @@ ws['!cols'] = [
                     )}
 
                     {/* ── DESKTOP TABLE ── */}
-                    <div className="bg-white rounded-xl shadow overflow-hidden hidden md:block">
+                    <div className="bg-white rounded-xl shadow overflow-hidden hidden md:block relative">
+                        {actionLoading && (
+                            <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10 rounded-xl">
+                                <div className="flex flex-col items-center gap-2">
+                                    <Loader size={32} className="text-indigo-600 animate-spin" />
+                                    <p className="text-sm text-gray-600 font-medium">{exporting ? "Exporting data..." : "Processing..."}</p>
+                                </div>
+                            </div>
+                        )}
                         <div className="overflow-x-auto">
                             <table className="w-full min-w-[700px]">
                                 <thead className="bg-gray-50 text-gray-500 text-sm">
@@ -234,7 +244,8 @@ ws['!cols'] = [
                                                 <td className="px-6 py-4">
                                                     <button
                                                         onClick={() => setExpandedId(expandedId === patient._id ? null : patient._id)}
-                                                        className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                                                        disabled={actionLoading}
+                                                        className="text-indigo-600 hover:text-indigo-800 text-sm font-medium disabled:opacity-50"
                                                     >
                                                         {expandedId === patient._id ? "Hide" : "View"}
                                                     </button>
@@ -243,7 +254,12 @@ ws['!cols'] = [
 
                                             {expandedId === patient._id && (
                                                 <tr className="bg-gray-50">
-                                                    <td colSpan={7} className="p-8">
+                                                    <td colSpan={7} className="p-8 relative">
+                                                        {actionLoading && (
+                                                            <div className="absolute inset-0 bg-gray-50/50 flex items-center justify-center rounded-lg">
+                                                                <Loader size={24} className="text-indigo-600 animate-spin" />
+                                                            </div>
+                                                        )}
                                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                                             <div className="bg-white border rounded-xl p-6 shadow-sm">
                                                                 <h3 className="font-semibold text-gray-800 mb-4">Patient Profile</h3>
@@ -292,7 +308,15 @@ ws['!cols'] = [
                     </div>
 
                     {/* ── MOBILE LIST ── */}
-                    <div className="md:hidden space-y-2">
+                    <div className="md:hidden space-y-2 relative">
+                        {actionLoading && (
+                            <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-20">
+                                <div className="bg-white rounded-xl p-6 flex flex-col items-center gap-3 shadow-xl">
+                                    <Loader size={36} className="text-indigo-600 animate-spin" />
+                                    <p className="text-sm text-gray-600 font-medium">{exporting ? "Exporting data..." : "Processing..."}</p>
+                                </div>
+                            </div>
+                        )}
                         {filteredPatients.map((patient, idx) => {
                             const diagnosis = patient.assessments?.[0]?.diagnosis?.title || patient.headacheType;
                             const doctor = patient.createdBy?.username || patient.createdBy?.email || "-";
@@ -300,7 +324,8 @@ ws['!cols'] = [
                                 <button
                                     key={patient._id}
                                     onClick={() => setSelectedPatient(patient)}
-                                    className="w-full bg-white rounded-2xl px-4 py-4 flex items-center gap-4 shadow-sm border border-gray-100 text-left active:scale-[0.99] transition-transform"
+                                    disabled={actionLoading}
+                                    className="w-full bg-white rounded-2xl px-4 py-4 flex items-center gap-4 shadow-sm border border-gray-100 text-left active:scale-[0.99] transition-transform disabled:opacity-50"
                                 >
                                     {/* Avatar */}
                                     <div className="w-11 h-11 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-base shrink-0">
@@ -340,8 +365,20 @@ ws['!cols'] = [
                         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-6">
                             <p className="text-sm text-gray-500">Page {page} of {pagination.pages}</p>
                             <div className="flex gap-3">
-                                <button onClick={() => setPage((p) => p - 1)} disabled={page === 1} className="px-4 py-2 bg-white border rounded-lg text-sm disabled:opacity-40">Prev</button>
-                                <button onClick={() => setPage((p) => p + 1)} disabled={page === pagination.pages} className="px-4 py-2 bg-white border rounded-lg text-sm disabled:opacity-40">Next</button>
+                                <button
+                                    onClick={() => setPage((p) => p - 1)}
+                                    disabled={page === 1 || actionLoading}
+                                    className="px-4 py-2 bg-white border rounded-lg text-sm disabled:opacity-40"
+                                >
+                                    Prev
+                                </button>
+                                <button
+                                    onClick={() => setPage((p) => p + 1)}
+                                    disabled={page === pagination.pages || actionLoading}
+                                    className="px-4 py-2 bg-white border rounded-lg text-sm disabled:opacity-40"
+                                >
+                                    Next
+                                </button>
                             </div>
                         </div>
                     )}
@@ -350,7 +387,7 @@ ws['!cols'] = [
             </div>
 
             {/* ── MOBILE BOTTOM SHEET ── */}
-            {selectedPatient && (
+            {selectedPatient && !actionLoading && (
                 <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end">
 
                     {/* Backdrop */}

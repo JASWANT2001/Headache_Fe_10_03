@@ -3,13 +3,14 @@ import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Sidebar from "./Sidebar";
-import { Search, Menu, FileDown, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, Menu, FileDown, Trash2, ChevronDown, ChevronUp, Loader } from "lucide-react";
 
 const Patients = ({ setCurrentView }) => {
 
     const [patients, setPatients] = useState([]);
     const [filteredPatients, setFilteredPatients] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState(false);
     const [error, setError] = useState("");
 
     const [expandedPatient, setExpandedPatient] = useState(null);
@@ -59,26 +60,35 @@ const Patients = ({ setCurrentView }) => {
             setExpandedPatient(null);
             return;
         }
-        const token = localStorage.getItem("token");
-        const res = await axios.get(
-            `/api/patients/${patientId}/assessments`,
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setPatientDetails(prev => ({ ...prev, [patientId]: res.data.data }));
-        setExpandedPatient(patientId);
+        try {
+            setActionLoading(true);
+            const token = localStorage.getItem("token");
+            const res = await axios.get(
+                `/api/patients/${patientId}/assessments`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setPatientDetails(prev => ({ ...prev, [patientId]: res.data.data }));
+            setExpandedPatient(patientId);
+        } catch (err) {
+            console.error(err);
+            setError("Failed to load patient details");
+        } finally {
+            setActionLoading(false);
+        }
     };
 
     /* PDF DOWNLOAD */
 
     const handleDownloadPDF = async (patientId) => {
         try {
+            setActionLoading(true);
             const token = localStorage.getItem("token");
             const res = await axios.get(
                 `/api/patients/${patientId}/assessments`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             const assessments = res.data.data || [];
-            if (assessments.length === 0) { alert("No assessments found"); return; }
+            if (assessments.length === 0) { alert("No assessments found"); setActionLoading(false); return; }
 
             const patient = patients.find((p) => p._id === patientId);
             const latestAssessment = assessments[assessments.length - 1];
@@ -158,6 +168,8 @@ const Patients = ({ setCurrentView }) => {
             doc.save(`${patient.name}_assessment_report.pdf`);
         } catch {
             alert("Failed to generate PDF");
+        } finally {
+            setActionLoading(false);
         }
     };
 
@@ -165,6 +177,7 @@ const Patients = ({ setCurrentView }) => {
 
     const handleDelete = async (patientId) => {
         try {
+            setActionLoading(true);
             const token = localStorage.getItem("token");
             await axios.delete(
                 `/api/patients/${patientId}`,
@@ -175,8 +188,21 @@ const Patients = ({ setCurrentView }) => {
             setDeleteTarget(null);
         } catch {
             alert("Failed to delete patient");
+        } finally {
+            setActionLoading(false);
         }
     };
+
+    if (loading) {
+        return (
+            <div className="flex min-h-screen bg-[#f5f7fb] items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader size={48} className="text-indigo-600 animate-spin" />
+                    <p className="text-gray-600 text-lg font-medium">Loading patients...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex min-h-screen bg-[#f5f7fb]">
@@ -230,14 +256,29 @@ const Patients = ({ setCurrentView }) => {
                             placeholder="Search patients..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full outline-none text-[15px]"
+                            disabled={actionLoading}
+                            className="w-full outline-none text-[15px] disabled:opacity-50"
                         />
                     </div>
 
                 </div>
 
+                {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-5 py-4 mb-6 text-sm">
+                        {error}
+                    </div>
+                )}
+
                 {/* ── DESKTOP TABLE (md+) ── */}
-                <div className="hidden md:block bg-white rounded-xl shadow border overflow-hidden">
+                <div className="hidden md:block bg-white rounded-xl shadow border overflow-hidden relative">
+                    {actionLoading && (
+                        <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10 rounded-xl">
+                            <div className="flex flex-col items-center gap-2">
+                                <Loader size={32} className="text-indigo-600 animate-spin" />
+                                <p className="text-sm text-gray-600 font-medium">Processing...</p>
+                            </div>
+                        </div>
+                    )}
                     <div className="overflow-x-auto">
                         <table className="w-full text-[15px]">
                             <thead className="bg-gray-50 text-gray-500">
@@ -269,19 +310,23 @@ const Patients = ({ setCurrentView }) => {
                                             <td className="px-6 py-4 flex justify-end gap-2 pr-8">
                                                 <button
                                                     onClick={() => handleViewDetails(patient._id)}
-                                                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-sm"
+                                                    disabled={actionLoading}
+                                                    className="bg-indigo-500 hover:bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2 disabled:opacity-50"
                                                 >
                                                     {expandedPatient === patient._id ? "Hide" : "View"}
                                                 </button>
                                                 <button
                                                     onClick={() => handleDownloadPDF(patient._id)}
-                                                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-lg text-sm"
+                                                    disabled={actionLoading}
+                                                    className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2 disabled:opacity-50"
                                                 >
+                                                    {actionLoading ? <Loader size={14} className="animate-spin" /> : null}
                                                     PDF
                                                 </button>
                                                 <button
                                                     onClick={() => setDeleteTarget(patient._id)}
-                                                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg text-sm"
+                                                    disabled={actionLoading}
+                                                    className="bg-rose-500 hover:bg-rose-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
                                                 >
                                                     Delete
                                                 </button>
@@ -291,7 +336,12 @@ const Patients = ({ setCurrentView }) => {
                                         {/* EXPANDED VIEW — desktop */}
                                         {expandedPatient === patient._id && (
                                             <tr className="bg-gray-50">
-                                                <td colSpan="5" className="p-6">
+                                                <td colSpan="5" className="p-6 relative">
+                                                    {actionLoading && (
+                                                        <div className="absolute inset-0 bg-gray-50/50 flex items-center justify-center rounded-lg">
+                                                            <Loader size={24} className="text-indigo-600 animate-spin" />
+                                                        </div>
+                                                    )}
                                                     <div className="grid grid-cols-4 gap-6">
                                                         <div className="bg-white rounded-xl border p-5">
                                                             <h3 className="font-semibold mb-4">Patient Profile</h3>
@@ -303,36 +353,36 @@ const Patients = ({ setCurrentView }) => {
                                                             <p>Created On: {new Date(patient.createdAt).toLocaleDateString()}</p>
                                                             <p>Patient ID: {patient.patientId}</p>
                                                         </div>
-                                                     <div className="bg-white rounded-xl border p-5">
-    <h3 className="font-semibold mb-4">Diagnosis History</h3>
-    {patientDetails[patient._id]?.map((a, i) => (
-        <div key={i} className="border rounded-lg p-3 mb-3 bg-gray-50">
-            <p className="font-medium text-sm">{a.diagnosis?.title}</p>
-            <p className="text-xs text-gray-500 mb-2">{new Date(a.createdAt).toLocaleDateString()}</p>
-            
-            <div className="border-t pt-2 mt-2 space-y-1">
-                <p className="text-xs">
-                    <span className="font-semibold">Match Prescription:</span>{" "}
-                    <span className={a.diagnosisMatch ? "text-green-600" : "text-red-600"}>
-                        {a.diagnosisMatch ? "Yes" : "No"}
-                    </span>
-                </p>
-                
-                {!a.diagnosisMatch && a.diagnosisIssue && (
-                    <p className="text-xs">
-                        <span className="font-semibold">Issue:</span> {a.diagnosisIssue}
-                    </p>
-                )}
-                
-                {a.remarks && (
-                    <p className="text-xs">
-                        <span className="font-semibold">Remarks:</span> {a.remarks}
-                    </p>
-                )}
-            </div>
-        </div>
-    ))}
-</div>
+                                                        <div className="bg-white rounded-xl border p-5">
+                                                            <h3 className="font-semibold mb-4">Diagnosis History</h3>
+                                                            {patientDetails[patient._id]?.map((a, i) => (
+                                                                <div key={i} className="border rounded-lg p-3 mb-3 bg-gray-50">
+                                                                    <p className="font-medium text-sm">{a.diagnosis?.title}</p>
+                                                                    <p className="text-xs text-gray-500 mb-2">{new Date(a.createdAt).toLocaleDateString()}</p>
+
+                                                                    <div className="border-t pt-2 mt-2 space-y-1">
+                                                                        <p className="text-xs">
+                                                                            <span className="font-semibold">Match Prescription:</span>{" "}
+                                                                            <span className={a.diagnosisMatch ? "text-green-600" : "text-red-600"}>
+                                                                                {a.diagnosisMatch ? "Yes" : "No"}
+                                                                            </span>
+                                                                        </p>
+
+                                                                        {!a.diagnosisMatch && a.diagnosisIssue && (
+                                                                            <p className="text-xs">
+                                                                                <span className="font-semibold">Issue:</span> {a.diagnosisIssue}
+                                                                            </p>
+                                                                        )}
+
+                                                                        {a.remarks && (
+                                                                            <p className="text-xs">
+                                                                                <span className="font-semibold">Remarks:</span> {a.remarks}
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
                                                         <div className="bg-white rounded-xl border p-5">
                                                             <h3 className="font-semibold mb-4">Patient Image</h3>
                                                             {patient.patientImage ? (
@@ -359,7 +409,15 @@ const Patients = ({ setCurrentView }) => {
                 </div>
 
                 {/* ── MOBILE CARD LIST (below md) ── */}
-                <div className="md:hidden space-y-3">
+                <div className="md:hidden space-y-3 relative">
+                    {actionLoading && (
+                        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-20">
+                            <div className="bg-white rounded-xl p-6 flex flex-col items-center gap-3 shadow-xl">
+                                <Loader size={36} className="text-indigo-600 animate-spin" />
+                                <p className="text-sm text-gray-600 font-medium">Processing...</p>
+                            </div>
+                        </div>
+                    )}
                     {filteredPatients.map((patient) => (
                         <div key={patient._id} className="bg-white rounded-xl shadow border overflow-hidden">
 
@@ -379,7 +437,8 @@ const Patients = ({ setCurrentView }) => {
 
                                 <button
                                     onClick={() => handleViewDetails(patient._id)}
-                                    className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100"
+                                    disabled={actionLoading}
+                                    className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 disabled:opacity-50"
                                 >
                                     {expandedPatient === patient._id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                                 </button>
@@ -393,13 +452,16 @@ const Patients = ({ setCurrentView }) => {
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => handleDownloadPDF(patient._id)}
-                                        className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-xs"
+                                        disabled={actionLoading}
+                                        className="flex items-center gap-1 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
                                     >
-                                        <FileDown size={13} /> PDF
+                                        {actionLoading ? <Loader size={13} className="animate-spin" /> : <FileDown size={13} />}
+                                        PDF
                                     </button>
                                     <button
                                         onClick={() => setDeleteTarget(patient._id)}
-                                        className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs"
+                                        disabled={actionLoading}
+                                        className="flex items-center gap-1 bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
                                     >
                                         <Trash2 size={13} /> Delete
                                     </button>
@@ -425,40 +487,40 @@ const Patients = ({ setCurrentView }) => {
                                     </div>
 
                                     {/* Diagnosis History */}
-                                 <div className="bg-gray-50 rounded-xl border p-4">
-    <h3 className="font-semibold text-sm mb-2">Diagnosis History</h3>
-    {patientDetails[patient._id]?.length > 0 ? (
-        patientDetails[patient._id].map((a, i) => (
-            <div key={i} className="border rounded-lg p-3 mb-2 bg-white">
-                <p className="font-medium text-xs">{a.diagnosis?.title}</p>
-                <p className="text-xs text-gray-400 mb-2">{new Date(a.createdAt).toLocaleDateString()}</p>
-                
-                <div className="border-t pt-2 space-y-1">
-                    <p className="text-xs">
-                        <span className="font-semibold">Match:</span>{" "}
-                        <span className={a.diagnosisMatch ? "text-green-600" : "text-red-600"}>
-                            {a.diagnosisMatch ? "Yes" : "No"}
-                        </span>
-                    </p>
-                    
-                    {!a.diagnosisMatch && a.diagnosisIssue && (
-                        <p className="text-xs">
-                            <span className="font-semibold">Issue:</span> {a.diagnosisIssue}
-                        </p>
-                    )}
-                    
-                    {a.remarks && (
-                        <p className="text-xs">
-                            <span className="font-semibold">Remarks:</span> {a.remarks}
-                        </p>
-                    )}
-                </div>
-            </div>
-        ))
-    ) : (
-        <p className="text-xs text-gray-400">No history available</p>
-    )}
-</div>
+                                    <div className="bg-gray-50 rounded-xl border p-4">
+                                        <h3 className="font-semibold text-sm mb-2">Diagnosis History</h3>
+                                        {patientDetails[patient._id]?.length > 0 ? (
+                                            patientDetails[patient._id].map((a, i) => (
+                                                <div key={i} className="border rounded-lg p-3 mb-2 bg-white">
+                                                    <p className="font-medium text-xs">{a.diagnosis?.title}</p>
+                                                    <p className="text-xs text-gray-400 mb-2">{new Date(a.createdAt).toLocaleDateString()}</p>
+
+                                                    <div className="border-t pt-2 space-y-1">
+                                                        <p className="text-xs">
+                                                            <span className="font-semibold">Match:</span>{" "}
+                                                            <span className={a.diagnosisMatch ? "text-green-600" : "text-red-600"}>
+                                                                {a.diagnosisMatch ? "Yes" : "No"}
+                                                            </span>
+                                                        </p>
+
+                                                        {!a.diagnosisMatch && a.diagnosisIssue && (
+                                                            <p className="text-xs">
+                                                                <span className="font-semibold">Issue:</span> {a.diagnosisIssue}
+                                                            </p>
+                                                        )}
+
+                                                        {a.remarks && (
+                                                            <p className="text-xs">
+                                                                <span className="font-semibold">Remarks:</span> {a.remarks}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-xs text-gray-400">No history available</p>
+                                        )}
+                                    </div>
 
                                     {/* Patient Image */}
                                     <div className="bg-gray-50 rounded-xl border p-4">
@@ -493,14 +555,17 @@ const Patients = ({ setCurrentView }) => {
                         <div className="flex justify-end gap-3">
                             <button
                                 onClick={() => setDeleteTarget(null)}
-                                className="px-4 py-2 border rounded-lg"
+                                disabled={actionLoading}
+                                className="px-4 py-2 border rounded-lg disabled:opacity-50"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={() => handleDelete(deleteTarget)}
-                                className="px-4 py-2 bg-red-600 text-white rounded-lg"
+                                disabled={actionLoading}
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg flex items-center gap-2 disabled:opacity-50"
                             >
+                                {actionLoading ? <Loader size={14} className="animate-spin" /> : null}
                                 Delete
                             </button>
                         </div>

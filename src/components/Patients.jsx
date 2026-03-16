@@ -3,7 +3,7 @@ import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Sidebar from "./Sidebar";
-import { Search, Menu, FileDown, Trash2, ChevronDown, ChevronUp, Loader } from "lucide-react";
+import { Search, Menu, Download, Trash2, ChevronDown, ChevronUp, Loader, Pencil } from "lucide-react";
 
 const Patients = ({ setCurrentView }) => {
 
@@ -16,6 +16,18 @@ const Patients = ({ setCurrentView }) => {
     const [expandedPatient, setExpandedPatient] = useState(null);
     const [patientDetails, setPatientDetails] = useState({});
     const [deleteTarget, setDeleteTarget] = useState(null);
+    const [editingPatient, setEditingPatient] = useState(null);
+    const [editForm, setEditForm] = useState({
+        name: "",
+        patientId: "",
+        age: "",
+        specialty: "",
+        type: "",
+        language: "",
+        qualification: "",
+        remarks: "",
+    });
+    const [editErrors, setEditErrors] = useState({});
 
     const [searchQuery, setSearchQuery] = useState("");
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -52,6 +64,102 @@ const Patients = ({ setCurrentView }) => {
         }
         setFilteredPatients(filtered);
     }, [searchQuery, patients]);
+
+    const validateEditForm = () => {
+        const errors = {};
+
+        if (!editForm.name.trim()) errors.name = "Patient name is required.";
+        if (!editForm.age || Number.isNaN(Number(editForm.age)) || Number(editForm.age) < 0 || Number(editForm.age) > 130) {
+            errors.age = "Valid age required.";
+        }
+        if (!editForm.specialty.trim()) errors.specialty = "Specialty is required.";
+        if (!editForm.type) errors.type = "Please select type.";
+        if (!editForm.language.trim()) errors.language = "Language is required.";
+        if (!editForm.qualification.trim()) errors.qualification = "Qualification is required.";
+
+        return errors;
+    };
+
+    const getPatientImageUrl = (patientImage) => {
+        if (!patientImage) return "";
+        return patientImage.startsWith("http")
+            ? patientImage
+            : `http://3.239.186.138:5001${patientImage}`;
+    };
+
+    const startEditingPatient = (patient) => {
+        setExpandedPatient(patient._id);
+        setEditingPatient(patient._id);
+        setEditForm({
+            name: patient.name || "",
+            patientId: patient.patientId || "",
+            age: patient.age || "",
+            specialty: patient.specialty || "",
+            type: patient.type || "",
+            language: patient.language || "",
+            qualification: patient.qualification || "",
+            remarks: patient.remarks || "",
+        });
+        setEditErrors({});
+        setError("");
+    };
+
+    const cancelEditingPatient = () => {
+        setEditingPatient(null);
+        setEditErrors({});
+    };
+
+    const handleEditChange = (e) => {
+        const { name, value } = e.target;
+        setEditForm((prev) => ({ ...prev, [name]: value }));
+        if (editErrors[name]) {
+            setEditErrors((prev) => ({ ...prev, [name]: null }));
+        }
+    };
+
+    const handleUpdatePatient = async (patientId) => {
+        const validationErrors = validateEditForm();
+        if (Object.keys(validationErrors).length > 0) {
+            setEditErrors(validationErrors);
+            return;
+        }
+
+        try {
+            setActionLoading(true);
+            const token = localStorage.getItem("token");
+            const payload = {
+                name: editForm.name.trim(),
+                patientId: editForm.patientId.trim() || undefined,
+                age: Number(editForm.age),
+                specialty: editForm.specialty.trim(),
+                type: editForm.type,
+                language: editForm.language.trim(),
+                qualification: editForm.qualification.trim(),
+                remarks: editForm.remarks.trim(),
+            };
+
+            const res = await axios.put(
+                `/api/patients/${patientId}`,
+                payload,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            const existingPatient = patients.find((patient) => patient._id === patientId);
+            const updatedPatient = res.data?.data
+                ? { ...existingPatient, ...res.data.data }
+                : { ...existingPatient, ...payload };
+
+            setPatients((prev) =>
+                prev.map((patient) => (patient._id === patientId ? updatedPatient : patient))
+            );
+            cancelEditingPatient();
+        } catch (err) {
+            console.error(err);
+            setError("Failed to update patient details");
+        } finally {
+            setActionLoading(false);
+        }
+    };
 
     /* VIEW DETAILS */
 
@@ -316,19 +424,30 @@ const Patients = ({ setCurrentView }) => {
                                                     {expandedPatient === patient._id ? "Hide" : "View"}
                                                 </button>
                                                 <button
+                                                    onClick={() => startEditingPatient(patient)}
+                                                    disabled={actionLoading}
+                                                    className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2 disabled:opacity-50"
+                                                >
+                                                    <Pencil size={14} />
+                                                    Edit
+                                                </button>
+                                                <button
                                                     onClick={() => handleDownloadPDF(patient._id)}
                                                     disabled={actionLoading}
-                                                    className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2 disabled:opacity-50"
+                                                    className="bg-emerald-500 hover:bg-emerald-600 text-white p-2.5 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
+                                                    aria-label="Download PDF"
+                                                    title="Download PDF"
                                                 >
-                                                    {actionLoading ? <Loader size={14} className="animate-spin" /> : null}
-                                                    PDF
+                                                    {actionLoading ? <Loader size={16} className="animate-spin" /> : <Download size={16} />}
                                                 </button>
                                                 <button
                                                     onClick={() => setDeleteTarget(patient._id)}
                                                     disabled={actionLoading}
-                                                    className="bg-rose-500 hover:bg-rose-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
+                                                    className="bg-rose-500 hover:bg-rose-600 text-white p-2.5 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
+                                                    aria-label="Delete patient"
+                                                    title="Delete patient"
                                                 >
-                                                    Delete
+                                                    <Trash2 size={16} />
                                                 </button>
                                             </td>
                                         </tr>
@@ -345,13 +464,94 @@ const Patients = ({ setCurrentView }) => {
                                                     <div className="grid grid-cols-4 gap-6">
                                                         <div className="bg-white rounded-xl border p-5">
                                                             <h3 className="font-semibold mb-4">Patient Profile</h3>
-                                                            <p>Name: {patient.name}</p>
-                                                            <p>Age: {patient.age}</p>
+                                                            {editingPatient === patient._id ? (
+                                                                <div className="space-y-3">
+                                                                    <div>
+                                                                        <label className="text-xs font-medium text-gray-600 block mb-1">Name</label>
+                                                                        <input
+                                                                            name="name"
+                                                                            value={editForm.name}
+                                                                            onChange={handleEditChange}
+                                                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                                                                        />
+                                                                        {editErrors.name && <p className="text-xs text-red-500 mt-1">{editErrors.name}</p>}
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="text-xs font-medium text-gray-600 block mb-1">Age</label>
+                                                                        <input
+                                                                            type="number"
+                                                                            name="age"
+                                                                            value={editForm.age}
+                                                                            onChange={handleEditChange}
+                                                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                                                                        />
+                                                                        {editErrors.age && <p className="text-xs text-red-500 mt-1">{editErrors.age}</p>}
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="text-xs font-medium text-gray-600 block mb-1">Specialty</label>
+                                                                        <input
+                                                                            name="specialty"
+                                                                            value={editForm.specialty}
+                                                                            onChange={handleEditChange}
+                                                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                                                                        />
+                                                                        {editErrors.specialty && <p className="text-xs text-red-500 mt-1">{editErrors.specialty}</p>}
+                                                                    </div>
+                                                                </div>
+                                                            ) : (
+                                                                <>
+                                                                    <p>Name: {patient.name}</p>
+                                                                    <p>Age: {patient.age}</p>
+                                                                    <p>Specialty: {patient.specialty || "N/A"}</p>
+                                                                </>
+                                                            )}
                                                         </div>
                                                         <div className="bg-white rounded-xl border p-5">
                                                             <h3 className="font-semibold mb-4">Doctor Information</h3>
-                                                            <p>Created On: {new Date(patient.createdAt).toLocaleDateString()}</p>
-                                                            <p>Patient ID: {patient.patientId}</p>
+                                                            {editingPatient === patient._id ? (
+                                                                <div className="space-y-3">
+                                                                    <div>
+                                                                        <label className="text-xs font-medium text-gray-600 block mb-1">Patient ID</label>
+                                                                        <input
+                                                                            name="patientId"
+                                                                            value={editForm.patientId}
+                                                                            onChange={handleEditChange}
+                                                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                                                                        />
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="text-xs font-medium text-gray-600 block mb-1">Type</label>
+                                                                        <select
+                                                                            name="type"
+                                                                            value={editForm.type}
+                                                                            onChange={handleEditChange}
+                                                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                                                                        >
+                                                                            <option value="">Select type</option>
+                                                                            <option value="Self">Self</option>
+                                                                            <option value="Assisted">Assisted</option>
+                                                                        </select>
+                                                                        {editErrors.type && <p className="text-xs text-red-500 mt-1">{editErrors.type}</p>}
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="text-xs font-medium text-gray-600 block mb-1">Language</label>
+                                                                        <input
+                                                                            name="language"
+                                                                            value={editForm.language}
+                                                                            onChange={handleEditChange}
+                                                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                                                                        />
+                                                                        {editErrors.language && <p className="text-xs text-red-500 mt-1">{editErrors.language}</p>}
+                                                                    </div>
+                                                                    <p className="text-sm text-gray-500">Created On: {new Date(patient.createdAt).toLocaleDateString()}</p>
+                                                                </div>
+                                                            ) : (
+                                                                <>
+                                                                    <p>Created On: {new Date(patient.createdAt).toLocaleDateString()}</p>
+                                                                    <p>Patient ID: {patient.patientId}</p>
+                                                                    <p>Language: {patient.language || "N/A"}</p>
+                                                                </>
+                                                            )}
                                                         </div>
                                                         <div className="bg-white rounded-xl border p-5">
                                                             <h3 className="font-semibold mb-4">Diagnosis History</h3>
@@ -387,13 +587,53 @@ const Patients = ({ setCurrentView }) => {
                                                             <h3 className="font-semibold mb-4">Patient Image</h3>
                                                             {patient.patientImage ? (
                                                                 <img
-                                                                    src={patient.patientImage.startsWith('http') ? patient.patientImage : `http://3.239.186.138:5001${patient.patientImage}`}
+                                                                    src={getPatientImageUrl(patient.patientImage)}
                                                                     alt={patient.name}
                                                                     className="w-full h-40 object-cover rounded-lg"
                                                                 />
                                                             ) : (
                                                                 <div className="w-full h-40 bg-gray-100 rounded-lg flex items-center justify-center">
                                                                     <p className="text-gray-400">No image</p>
+                                                                </div>
+                                                            )}
+                                                            {editingPatient === patient._id && (
+                                                                <div className="mt-4 space-y-3">
+                                                                    <div>
+                                                                        <label className="text-xs font-medium text-gray-600 block mb-1">Qualification</label>
+                                                                        <input
+                                                                            name="qualification"
+                                                                            value={editForm.qualification}
+                                                                            onChange={handleEditChange}
+                                                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                                                                        />
+                                                                        {editErrors.qualification && <p className="text-xs text-red-500 mt-1">{editErrors.qualification}</p>}
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="text-xs font-medium text-gray-600 block mb-1">Clinical Notes</label>
+                                                                        <textarea
+                                                                            name="remarks"
+                                                                            rows="3"
+                                                                            value={editForm.remarks}
+                                                                            onChange={handleEditChange}
+                                                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                                                                        />
+                                                                    </div>
+                                                                    <div className="flex gap-2 pt-1">
+                                                                        <button
+                                                                            onClick={() => handleUpdatePatient(patient._id)}
+                                                                            disabled={actionLoading}
+                                                                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
+                                                                        >
+                                                                            Save
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={cancelEditingPatient}
+                                                                            disabled={actionLoading}
+                                                                            className="border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 disabled:opacity-50"
+                                                                        >
+                                                                            Cancel
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
                                                             )}
                                                         </div>
@@ -451,19 +691,37 @@ const Patients = ({ setCurrentView }) => {
                                 </span>
                                 <div className="flex gap-2">
                                     <button
+                                        onClick={() => handleViewDetails(patient._id)}
+                                        disabled={actionLoading}
+                                        className="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
+                                    >
+                                        {expandedPatient === patient._id ? "Hide" : "View"}
+                                    </button>
+                                    <button
+                                        onClick={() => startEditingPatient(patient)}
+                                        disabled={actionLoading}
+                                        className="flex items-center gap-1 bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
+                                    >
+                                        <Pencil size={13} />
+                                        Edit
+                                    </button>
+                                    <button
                                         onClick={() => handleDownloadPDF(patient._id)}
                                         disabled={actionLoading}
-                                        className="flex items-center gap-1 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
+                                        className="bg-emerald-500 hover:bg-emerald-600 text-white p-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
+                                        aria-label="Download PDF"
+                                        title="Download PDF"
                                     >
-                                        {actionLoading ? <Loader size={13} className="animate-spin" /> : <FileDown size={13} />}
-                                        PDF
+                                        {actionLoading ? <Loader size={13} className="animate-spin" /> : <Download size={13} />}
                                     </button>
                                     <button
                                         onClick={() => setDeleteTarget(patient._id)}
                                         disabled={actionLoading}
-                                        className="flex items-center gap-1 bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
+                                        className="bg-rose-500 hover:bg-rose-600 text-white p-2 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
+                                        aria-label="Delete patient"
+                                        title="Delete patient"
                                     >
-                                        <Trash2 size={13} /> Delete
+                                        <Trash2 size={13} />
                                     </button>
                                 </div>
                             </div>
@@ -476,13 +734,70 @@ const Patients = ({ setCurrentView }) => {
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="bg-gray-50 rounded-xl border p-4">
                                             <h3 className="font-semibold text-sm mb-2">Patient Profile</h3>
-                                            <p className="text-xs text-gray-600">Name: {patient.name}</p>
-                                            <p className="text-xs text-gray-600">Age: {patient.age}</p>
+                                            {editingPatient === patient._id ? (
+                                                <div className="space-y-2">
+                                                    <input
+                                                        name="name"
+                                                        value={editForm.name}
+                                                        onChange={handleEditChange}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500"
+                                                    />
+                                                    <input
+                                                        type="number"
+                                                        name="age"
+                                                        value={editForm.age}
+                                                        onChange={handleEditChange}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500"
+                                                    />
+                                                    <input
+                                                        name="specialty"
+                                                        value={editForm.specialty}
+                                                        onChange={handleEditChange}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <p className="text-xs text-gray-600">Name: {patient.name}</p>
+                                                    <p className="text-xs text-gray-600">Age: {patient.age}</p>
+                                                    <p className="text-xs text-gray-600">Specialty: {patient.specialty || "N/A"}</p>
+                                                </>
+                                            )}
                                         </div>
                                         <div className="bg-gray-50 rounded-xl border p-4">
                                             <h3 className="font-semibold text-sm mb-2">Info</h3>
-                                            <p className="text-xs text-gray-600">Created: {new Date(patient.createdAt).toLocaleDateString()}</p>
-                                            <p className="text-xs text-gray-600">ID: {patient.patientId}</p>
+                                            {editingPatient === patient._id ? (
+                                                <div className="space-y-2">
+                                                    <input
+                                                        name="patientId"
+                                                        value={editForm.patientId}
+                                                        onChange={handleEditChange}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500"
+                                                    />
+                                                    <select
+                                                        name="type"
+                                                        value={editForm.type}
+                                                        onChange={handleEditChange}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500"
+                                                    >
+                                                        <option value="">Select type</option>
+                                                        <option value="Self">Self</option>
+                                                        <option value="Assisted">Assisted</option>
+                                                    </select>
+                                                    <input
+                                                        name="language"
+                                                        value={editForm.language}
+                                                        onChange={handleEditChange}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <p className="text-xs text-gray-600">Created: {new Date(patient.createdAt).toLocaleDateString()}</p>
+                                                    <p className="text-xs text-gray-600">ID: {patient.patientId}</p>
+                                                    <p className="text-xs text-gray-600">Language: {patient.language || "N/A"}</p>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
 
@@ -527,13 +842,49 @@ const Patients = ({ setCurrentView }) => {
                                         <h3 className="font-semibold text-sm mb-2">Patient Image</h3>
                                         {patient.patientImage ? (
                                             <img
-                                                src={patient.patientImage.startsWith('http') ? patient.patientImage : `http://3.239.186.138:5001${patient.patientImage}`}
+                                                src={getPatientImageUrl(patient.patientImage)}
                                                 alt={patient.name}
                                                 className="w-full h-36 object-cover rounded-lg"
                                             />
                                         ) : (
                                             <div className="w-full h-36 bg-gray-100 rounded-lg flex items-center justify-center">
                                                 <p className="text-gray-400 text-xs">No image</p>
+                                            </div>
+                                        )}
+                                        {editingPatient === patient._id && (
+                                            <div className="mt-3 space-y-3">
+                                                <input
+                                                    name="qualification"
+                                                    value={editForm.qualification}
+                                                    onChange={handleEditChange}
+                                                    placeholder="Qualification"
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500"
+                                                />
+                                                {editErrors.qualification && <p className="text-xs text-red-500 -mt-2">{editErrors.qualification}</p>}
+                                                <textarea
+                                                    name="remarks"
+                                                    rows="3"
+                                                    value={editForm.remarks}
+                                                    onChange={handleEditChange}
+                                                    placeholder="Clinical notes"
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                                                />
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => handleUpdatePatient(patient._id)}
+                                                        disabled={actionLoading}
+                                                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs font-medium disabled:opacity-50"
+                                                    >
+                                                        Save
+                                                    </button>
+                                                    <button
+                                                        onClick={cancelEditingPatient}
+                                                        disabled={actionLoading}
+                                                        className="border border-gray-300 px-4 py-2 rounded-lg text-xs font-medium text-gray-700 disabled:opacity-50"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
                                             </div>
                                         )}
                                     </div>

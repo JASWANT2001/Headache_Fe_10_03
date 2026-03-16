@@ -78,7 +78,7 @@ function MedicalIllustration() {
           {/* Intelligent */}
           <br />
           <span style={{ color: "#60a5fa" }}>
-            Headache Diagnostics
+            Headache Compass
           </span>
         </h2>
 
@@ -89,10 +89,7 @@ function MedicalIllustration() {
             lineHeight: 1.6
           }}
         >
-          Secure clinical platform designed to help
-          neurologists analyze headache patterns
-          and deliver personalized treatments.
-        </p>
+          A clinical decision-support platform designed to assist doctors         </p>
       </div>
 
       {/* Animation keyframes */}
